@@ -1,8 +1,10 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-08-30T21:27:54.308Z",
+  "exportedAt": "2026-08-30T21:27:59.907Z",
   "sessions": [],
   "overrides": {},
-  "skips": {}
+  "skips": {
+    "2026-08-30": "push"
+  }
 }
