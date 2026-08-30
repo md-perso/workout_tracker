@@ -1,8 +1,79 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-08-30T19:32:08.251Z",
-  "sessions": [],
+  "exportedAt": "2026-08-30T19:32:52.339Z",
+  "sessions": [
+    {
+      "id": "mtg7ib7q-7q2x34",
+      "date": "2026-08-30T19:32:48.326Z",
+      "day": "push",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "push-db-ohp",
+          "weightKg": 15,
+          "reps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-db-incline-press",
+          "weightKg": 16,
+          "reps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-leaning-lateral",
+          "weightKg": 7,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-lateral-raise",
+          "weightKg": 6,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-feet-elevated-pushup",
+          "weightKg": null,
+          "reps": [
+            null,
+            null,
+            null
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-triceps-pushdown",
+          "weightKg": 20,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        }
+      ]
+    }
+  ],
   "overrides": {},
   "skips": {}
 }
