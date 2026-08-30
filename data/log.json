@@ -1,0 +1,252 @@
+{
+  "app": "workout-tracker",
+  "version": 1,
+  "exportedAt": "2026-08-30T18:35:56.595Z",
+  "sessions": [
+    {
+      "id": "mtg4u496-vuw1rm",
+      "date": "2026-08-30T18:18:00.331Z",
+      "day": "push",
+      "synced": true,
+      "entries": [
+        {
+          "exerciseId": "push-db-ohp",
+          "weightKg": 15,
+          "reps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-db-incline-press",
+          "weightKg": 16,
+          "reps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-leaning-lateral",
+          "weightKg": 7,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-lateral-raise",
+          "weightKg": 6,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-feet-elevated-pushup",
+          "weightKg": null,
+          "reps": [
+            null,
+            null,
+            null
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-triceps-pushdown",
+          "weightKg": 20,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        }
+      ]
+    },
+    {
+      "id": "mtg4umgi-2niqx5",
+      "date": "2026-08-30T18:18:23.922Z",
+      "day": "pull",
+      "synced": true,
+      "entries": [
+        {
+          "exerciseId": "pull-scap-pullup",
+          "weightKg": null,
+          "reps": [
+            8,
+            8
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-activation",
+          "weightKg": 10,
+          "reps": [
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-pullup",
+          "weightKg": null,
+          "reps": [
+            null,
+            null,
+            null
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-db-row",
+          "weightKg": 32,
+          "reps": [
+            10,
+            10,
+            10
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-chest-supported-row",
+          "weightKg": 12,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-working",
+          "weightKg": 20,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-face-pull",
+          "weightKg": 15,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-incline-curl",
+          "weightKg": 10,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success"
+        }
+      ]
+    },
+    {
+      "id": "mtg4vb1h-tb58mr",
+      "date": "2026-08-30T18:18:55.781Z",
+      "day": "push",
+      "synced": true,
+      "entries": [
+        {
+          "exerciseId": "push-db-ohp",
+          "weightKg": 15,
+          "reps": [
+            12,
+            12,
+            12,
+            null
+          ],
+          "outcome": "fail",
+          "missed": [
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "exerciseId": "push-db-incline-press",
+          "weightKg": 16,
+          "reps": [
+            15,
+            15,
+            15,
+            null
+          ],
+          "outcome": "fail",
+          "missed": [
+            false,
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "exerciseId": "push-leaning-lateral",
+          "weightKg": 7,
+          "reps": [
+            15,
+            15,
+            null
+          ],
+          "outcome": "fail",
+          "missed": [
+            false,
+            false,
+            true
+          ]
+        },
+        {
+          "exerciseId": "push-lateral-raise",
+          "weightKg": 6,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-feet-elevated-pushup",
+          "weightKg": null,
+          "reps": [
+            null,
+            null,
+            null
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "push-triceps-pushdown",
+          "weightKg": 20,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        }
+      ]
+    }
+  ],
+  "overrides": {},
+  "skips": {}
+}

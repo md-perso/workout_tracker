@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "days": {
+    "push": {
+      "name": "Push",
+      "exercises": [
+        {
+          "id": "push-db-ohp",
+          "name": "Seated DB overhead press",
+          "sets": 4,
+          "targetReps": "8-12",
+          "weightKg": 15,
+          "unit": "perHand",
+          "increment": 2,
+          "notes": "Back supported, press without flaring."
+        },
+        {
+          "id": "push-db-incline-press",
+          "name": "DB incline press",
+          "sets": 4,
+          "targetReps": "10-15",
+          "weightKg": 16,
+          "unit": "perHand",
+          "increment": 2,
+          "notes": "Bench around 30 degrees."
+        },
+        {
+          "id": "push-leaning-lateral",
+          "name": "Leaning DB lateral raise",
+          "sets": 3,
+          "targetReps": 15,
+          "weightKg": 7,
+          "unit": "single",
+          "increment": 1,
+          "notes": "Each side. Hang off an upright, lean away."
+        },
+        {
+          "id": "push-lateral-raise",
+          "name": "DB lateral raise",
+          "sets": 3,
+          "targetReps": "15-20",
+          "weightKg": 6,
+          "unit": "perHand",
+          "increment": 1,
+          "notes": "Strict, no swinging."
+        },
+        {
+          "id": "push-feet-elevated-pushup",
+          "name": "Feet-elevated push-ups",
+          "sets": 3,
+          "targetReps": "max",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "increment": null,
+          "notes": "Feet on a bench, full range."
+        },
+        {
+          "id": "push-triceps-pushdown",
+          "name": "Pulley triceps pushdown",
+          "sets": 3,
+          "targetReps": 15,
+          "weightKg": 20,
+          "unit": "pulley",
+          "increment": 2.5,
+          "notes": "Moderate. Elbows pinned to your sides."
+        }
+      ]
+    },
+    "pull": {
+      "name": "Pull",
+      "exercises": [
+        {
+          "id": "pull-scap-pullup",
+          "name": "Scapular pull-ups",
+          "sets": 2,
+          "targetReps": 8,
+          "weightKg": null,
+          "unit": "bodyweight",
+          "increment": null,
+          "notes": "Warm-up. Arms straight, drive shoulders down."
+        },
+        {
+          "id": "pull-sa-pulldown-activation",
+          "name": "Straight-arm pulldown (activation)",
+          "sets": 2,
+          "targetReps": 15,
+          "weightKg": 10,
+          "unit": "pulley",
+          "increment": 2.5,
+          "notes": "Light. Lat activation only, not a working set."
+        },
+        {
+          "id": "pull-pullup",
+          "name": "Pull-ups",
+          "sets": 3,
+          "targetReps": "max",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "increment": null,
+          "notes": "Full hang each rep."
+        },
+        {
+          "id": "pull-sa-db-row",
+          "name": "Single-arm DB row",
+          "sets": 3,
+          "targetReps": 10,
+          "weightKg": 32,
+          "unit": "single",
+          "increment": 2,
+          "notes": "Each side."
+        },
+        {
+          "id": "pull-chest-supported-row",
+          "name": "Chest-supported DB row",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 12,
+          "unit": "perHand",
+          "increment": 2,
+          "notes": "Chest stays on the bench."
+        },
+        {
+          "id": "pull-sa-pulldown-working",
+          "name": "Straight-arm pulldown (working)",
+          "sets": 3,
+          "targetReps": 15,
+          "weightKg": 20,
+          "unit": "pulley",
+          "increment": 2.5,
+          "notes": "Moderate. Arms straight, squeeze the lats."
+        },
+        {
+          "id": "pull-face-pull",
+          "name": "Face pulls",
+          "sets": 3,
+          "targetReps": 20,
+          "weightKg": 15,
+          "unit": "pulley",
+          "increment": 2.5,
+          "notes": "Light. Elbows high, pull to the forehead."
+        },
+        {
+          "id": "pull-incline-curl",
+          "name": "Incline DB curl",
+          "sets": 3,
+          "targetReps": 12,
+          "weightKg": 9,
+          "unit": "perHand",
+          "increment": 1,
+          "notes": "Bench at 45 degrees, arms hanging back."
+        }
+      ]
+    }
+  }
+}
