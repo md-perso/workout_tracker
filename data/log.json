@@ -1,13 +1,13 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-02T19:36:42.604Z",
+  "exportedAt": "2026-09-03T18:16:03.042Z",
   "sessions": [
     {
       "id": "mtkefh0g-uie8ns",
       "date": "2026-09-02T17:57:37.888Z",
       "day": "push",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "push-db-ohp",
