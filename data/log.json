@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-04T18:13:17.511Z",
+  "exportedAt": "2026-09-04T19:57:42.916Z",
   "sessions": [
     {
       "id": "mtkefh0g-uie8ns",
@@ -75,6 +75,92 @@
             15
           ],
           "outcome": "success"
+        }
+      ]
+    },
+    {
+      "id": "mtn9o0rh-vb87fm",
+      "date": "2026-09-04T18:07:37.181Z",
+      "day": "pull",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "pull-scap-pullup",
+          "weightKg": null,
+          "reps": [
+            8,
+            8
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-activation",
+          "weightKg": 10,
+          "reps": [
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-pullup",
+          "weightKg": 75,
+          "reps": [
+            7,
+            5,
+            5
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-db-row",
+          "weightKg": 22,
+          "reps": [
+            10,
+            10,
+            10
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-chest-supported-row",
+          "weightKg": 16,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-working",
+          "weightKg": 15,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-face-pull",
+          "weightKg": 15,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-incline-curl",
+          "weightKg": 12,
+          "reps": [
+            10,
+            8,
+            8
+          ],
+          "outcome": "short"
         }
       ]
     }
