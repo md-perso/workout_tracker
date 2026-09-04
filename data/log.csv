@@ -19,3 +19,25 @@ date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
 2026-09-02,push,Pulley triceps pushdown,15,1,15,done,success
 2026-09-02,push,Pulley triceps pushdown,15,2,15,done,success
 2026-09-02,push,Pulley triceps pushdown,15,3,15,done,success
+2026-09-04,pull,Scapular pull-ups,,1,8,done,success
+2026-09-04,pull,Scapular pull-ups,,2,8,done,success
+2026-09-04,pull,Straight-arm pulldown (activation),10,1,15,done,success
+2026-09-04,pull,Straight-arm pulldown (activation),10,2,15,done,success
+2026-09-04,pull,Pull-ups,75,1,7,done,success
+2026-09-04,pull,Pull-ups,75,2,5,done,success
+2026-09-04,pull,Pull-ups,75,3,5,done,success
+2026-09-04,pull,Single-arm DB row,22,1,10,done,success
+2026-09-04,pull,Single-arm DB row,22,2,10,done,success
+2026-09-04,pull,Single-arm DB row,22,3,10,done,success
+2026-09-04,pull,Chest-supported DB row,16,1,15,done,success
+2026-09-04,pull,Chest-supported DB row,16,2,15,done,success
+2026-09-04,pull,Chest-supported DB row,16,3,15,done,success
+2026-09-04,pull,Straight-arm pulldown (working),15,1,15,done,success
+2026-09-04,pull,Straight-arm pulldown (working),15,2,15,done,success
+2026-09-04,pull,Straight-arm pulldown (working),15,3,15,done,success
+2026-09-04,pull,Face pulls,15,1,20,done,success
+2026-09-04,pull,Face pulls,15,2,20,done,success
+2026-09-04,pull,Face pulls,15,3,20,done,success
+2026-09-04,pull,Incline DB curl,12,1,10,done,short
+2026-09-04,pull,Incline DB curl,12,2,8,done,short
+2026-09-04,pull,Incline DB curl,12,3,8,done,short
