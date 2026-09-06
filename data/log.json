@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-04T19:57:42.916Z",
+  "exportedAt": "2026-09-06T17:10:57.744Z",
   "sessions": [
     {
       "id": "mtkefh0g-uie8ns",
@@ -82,7 +82,7 @@
       "id": "mtn9o0rh-vb87fm",
       "date": "2026-09-04T18:07:37.181Z",
       "day": "pull",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "pull-scap-pullup",
