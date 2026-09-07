@@ -3,7 +3,7 @@
  * Bump CACHE_VERSION whenever you change index.html, style.css, app.js or
  * routine.json, otherwise phones keep serving the old cached copy.
  */
-var CACHE_VERSION = 'v5';
+var CACHE_VERSION = 'v7';
 var CACHE_NAME = 'workout-tracker-' + CACHE_VERSION;
 
 var SHELL = [

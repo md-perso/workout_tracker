@@ -1,73 +1,143 @@
 {
-  "version": 1,
+  "version": 2,
+  "retired": {
+    "push-leaning-lateral": "Leaning DB lateral raise",
+    "push-feet-elevated-pushup": "Feet-elevated push-ups",
+    "pull-pullup": "Pull-ups"
+  },
   "days": {
-    "push": {
-      "name": "Push",
+    "push-a": {
+      "name": "Push A",
+      "family": "push",
+      "focus": "Chest focus",
       "exercises": [
+        {
+          "id": "push-flat-db-bench",
+          "name": "Flat DB bench press",
+          "sets": 4,
+          "targetReps": "6-10",
+          "weightKg": 14,
+          "unit": "perHand",
+          "description": "The main chest builder of the week. Two dumbbells pressed from a flat bench; loads the whole pec, front delts and triceps. Trainer: use your current flat-bench weight — set it once in Edit target, then try to beat it every session.",
+          "technique": [
+            "Feet flat and planted, shoulder blades pulled back and down into the bench.",
+            "Lower to the sides of the chest, elbows about 45° from your body — not flared to 90°.",
+            "Press up and slightly inward; stop just short of locking the elbows.",
+            "Control the descent, about two seconds down, no bouncing off the chest."
+          ]
+        },
         {
           "id": "push-db-ohp",
           "name": "Seated DB overhead press",
-          "sets": 4,
-          "targetReps": "8-12",
-          "weightKg": 15,
-          "unit": "perHand",
-          "increment": 2,
-          "notes": "Back supported, press without flaring."
-        },
-        {
-          "id": "push-db-incline-press",
-          "name": "DB incline press",
-          "sets": 4,
-          "targetReps": "10-15",
-          "weightKg": 16,
-          "unit": "perHand",
-          "increment": 2,
-          "notes": "Bench around 30 degrees."
-        },
-        {
-          "id": "push-leaning-lateral",
-          "name": "Leaning DB lateral raise",
           "sets": 3,
-          "targetReps": 15,
-          "weightKg": 7,
-          "unit": "single",
-          "increment": 1,
-          "notes": "Each side. Hang off an upright, lean away."
+          "targetReps": "8-10",
+          "weightKg": 10,
+          "unit": "perHand",
+          "description": "Seated shoulder press with dumbbells. Targets the front and side delts with the triceps assisting. Trainer: 2 kg below your usual overhead press weight, so the reps are clean.",
+          "technique": [
+            "Back supported on the bench, feet planted, ribs down — don't arch to cheat.",
+            "Start with the dumbbells at ear height, palms forward.",
+            "Press straight up until the arms are nearly straight, dumbbells close together at the top.",
+            "Lower under control to ear height each rep; don't drop below that."
+          ]
+        },
+        {
+          "id": "push-squeeze-press",
+          "name": "Squeeze press",
+          "sets": 3,
+          "targetReps": "10-12",
+          "weightKg": 8,
+          "unit": "perHand",
+          "description": "Flat press with the two dumbbells pressed hard against each other the whole time. The constant inward squeeze keeps the inner chest under tension. Trainer: around 60% of your flat bench weight.",
+          "technique": [
+            "Hold the dumbbells together, palms facing each other, and squeeze them into one another throughout.",
+            "Lower to the mid-chest, elbows tucked close to the ribs.",
+            "Press up while keeping the squeeze — if the dumbbells separate, the weight is too heavy.",
+            "Slow and deliberate; the squeeze matters more than the load."
+          ]
         },
         {
           "id": "push-lateral-raise",
           "name": "DB lateral raise",
           "sets": 3,
-          "targetReps": "15-20",
-          "weightKg": 6,
+          "targetReps": "12-15",
+          "weightKg": 8,
           "unit": "perHand",
-          "increment": 1,
-          "notes": "Strict, no swinging."
+          "description": "Standing raise out to the sides. Isolates the side delts, which give the shoulders their width. Trainer: 8 kg.",
+          "technique": [
+            "Slight bend in the elbows, torso leaning forward a touch, dumbbells at your sides.",
+            "Raise out to the sides until the arms are parallel to the floor, leading with the elbows.",
+            "Pinky slightly higher than the thumb at the top; don't shrug the traps up.",
+            "Lower slowly — no swinging or using the hips to start the rep."
+          ]
         },
         {
-          "id": "push-feet-elevated-pushup",
-          "name": "Feet-elevated push-ups",
+          "id": "push-skullcrusher",
+          "name": "Lying DB skullcrusher",
           "sets": 3,
-          "targetReps": "max",
-          "weightKg": null,
-          "unit": "bodyweight",
-          "increment": null,
-          "notes": "Feet on a bench, full range."
+          "targetReps": "10-12",
+          "weightKg": 8,
+          "unit": "perHand",
+          "description": "Lying triceps extension with dumbbells. Lowers the weight towards the head and extends back up; works the long head of the triceps. Trainer: 8–10 kg per hand.",
+          "technique": [
+            "Lie flat, arms straight above the chest, palms facing each other.",
+            "Keep the upper arms still and pointing slightly back over the head.",
+            "Bend only at the elbows, lowering the dumbbells beside the ears.",
+            "Extend back up without letting the elbows drift outward."
+          ]
         },
         {
           "id": "push-triceps-pushdown",
-          "name": "Pulley triceps pushdown",
+          "name": "Pulley pushdown",
           "sets": 3,
-          "targetReps": 15,
-          "weightKg": 20,
+          "targetReps": "12-15",
+          "weightKg": 17,
           "unit": "pulley",
-          "increment": 2.5,
-          "notes": "Moderate. Elbows pinned to your sides."
+          "description": "Cable triceps pushdown with a bar or rope. Finishes the triceps with a controlled, constant-tension movement. Trainer: 17 kg on the stack.",
+          "technique": [
+            "Stand tall, elbows pinned to your sides, slight forward lean.",
+            "Push down until the arms are fully straight and squeeze the triceps for a beat.",
+            "Let the handle rise only until the forearms pass parallel — the elbows stay put.",
+            "No leaning on the cable or driving with the shoulders."
+          ]
+        },
+        {
+          "id": "core-hanging-knee-raise",
+          "name": "Hanging knee raises",
+          "sets": 3,
+          "targetReps": "10-15",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "Hanging from a bar, bring the knees up towards the chest. Builds the lower abs and hip flexors while training grip.",
+          "technique": [
+            "Hang with a full grip, shoulders slightly pulled down so you are not just dangling.",
+            "Tuck the pelvis and curl the knees up towards the chest — the lower back should round a little.",
+            "Pause at the top, then lower slowly without swinging.",
+            "If you swing, reset to a dead hang before the next rep."
+          ]
+        },
+        {
+          "id": "core-side-plank",
+          "name": "Side plank",
+          "sets": 3,
+          "targetReps": 30,
+          "measure": "seconds",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "Static hold on one forearm with the body in a straight line. Trains the obliques and the muscles that stabilise the spine. Each set is one hold per side — log the seconds you held.",
+          "technique": [
+            "Elbow directly under the shoulder, feet stacked or staggered.",
+            "Lift the hips until shoulders, hips and ankles form a straight line.",
+            "Squeeze the glutes and keep the top hip from sinking or rotating back.",
+            "Breathe normally; stop the set when the line breaks, not when the clock says so."
+          ]
         }
       ]
     },
-    "pull": {
-      "name": "Pull",
+    "pull-a": {
+      "name": "Pull A",
+      "family": "pull",
+      "focus": "Lat focus",
       "exercises": [
         {
           "id": "pull-scap-pullup",
@@ -76,78 +146,434 @@
           "targetReps": 8,
           "weightKg": null,
           "unit": "bodyweight",
-          "increment": null,
-          "notes": "Warm-up. Arms straight, drive shoulders down."
+          "description": "Warm-up. Hanging from the bar with straight arms, pull the shoulder blades down and together to lift the body a few centimetres. Wakes up the lats and lower traps before the heavy pulling.",
+          "technique": [
+            "Dead hang with straight arms and a full grip.",
+            "Without bending the elbows, drive the shoulders down and away from the ears.",
+            "Hold the top for a second, then let the shoulders rise back up slowly.",
+            "Small movement — the arms never bend."
+          ]
         },
         {
           "id": "pull-sa-pulldown-activation",
-          "name": "Straight-arm pulldown (activation)",
+          "name": "Straight-arm pulldown (warm-up)",
           "sets": 2,
           "targetReps": 15,
           "weightKg": 10,
           "unit": "pulley",
-          "increment": 2.5,
-          "notes": "Light. Lat activation only, not a working set."
+          "description": "Light lat activation on the cable before the working sets. Not a working set — the goal is to feel the lats, not to fatigue them. Trainer: 10 kg on the stack.",
+          "technique": [
+            "Stand facing the high pulley, slight hinge at the hips, arms straight.",
+            "Sweep the bar down to the thighs in an arc, keeping the elbows nearly locked.",
+            "Squeeze the lats at the bottom, then let the bar rise slowly overhead.",
+            "Keep the load light enough to feel the lats on every rep."
+          ]
         },
         {
-          "id": "pull-pullup",
-          "name": "Pull-ups",
-          "sets": 3,
-          "targetReps": "max",
-          "weightKg": null,
-          "unit": "bodyweight",
-          "increment": null,
-          "notes": "Full hang each rep."
+          "id": "pull-kneeling-sa-pulldown",
+          "name": "Kneeling single-arm pulley pulldown",
+          "sets": 4,
+          "targetReps": "10-12",
+          "weightKg": 15,
+          "unit": "pulley",
+          "description": "Main lat exercise of the day. Kneeling under a high cable, pull one handle down to the hip. One arm at a time lets the lat go through its full range. Reps are per arm. Trainer: 15 kg on the stack.",
+          "technique": [
+            "Kneel with the working arm reaching up towards the pulley, torso slightly rotated towards it.",
+            "Pull the elbow down and back towards your hip, keeping the shoulder down.",
+            "Squeeze the lat at the bottom for a beat.",
+            "Let the arm rise fully so the lat gets a stretch at the top of every rep."
+          ]
         },
         {
           "id": "pull-sa-db-row",
           "name": "Single-arm DB row",
           "sets": 3,
-          "targetReps": 10,
-          "weightKg": 32,
+          "targetReps": "8-12",
+          "weightKg": 22,
           "unit": "single",
-          "increment": 2,
-          "notes": "Each side."
+          "description": "One-arm dumbbell row supported on a bench. Heavy lat and mid-back work with the free hand bracing. Reps are per side. Trainer: 22 kg.",
+          "technique": [
+            "Hand and knee on the bench, back flat and parallel to the floor.",
+            "Let the dumbbell hang straight down, shoulder blade relaxed.",
+            "Row the elbow up and back towards the hip, not straight up to the ceiling.",
+            "Lower all the way down for a stretch — no twisting the torso to lift it."
+          ]
         },
         {
-          "id": "pull-chest-supported-row",
-          "name": "Chest-supported DB row",
+          "id": "pull-db-pullover",
+          "name": "DB pullover",
           "sets": 3,
-          "targetReps": "12-15",
-          "weightKg": 12,
-          "unit": "perHand",
-          "increment": 2,
-          "notes": "Chest stays on the bench."
-        },
-        {
-          "id": "pull-sa-pulldown-working",
-          "name": "Straight-arm pulldown (working)",
-          "sets": 3,
-          "targetReps": 15,
-          "weightKg": 20,
-          "unit": "pulley",
-          "increment": 2.5,
-          "notes": "Moderate. Arms straight, squeeze the lats."
+          "targetReps": "10-12",
+          "weightKg": 16,
+          "unit": "single",
+          "description": "Lying across a bench, lower one dumbbell behind the head and pull it back over the chest. Stretches and loads the lats and serratus. Trainer: one 16 kg dumbbell.",
+          "technique": [
+            "Lie on the bench, hold one dumbbell with both hands above the chest, slight elbow bend.",
+            "Lower it in an arc behind the head until you feel a stretch through the lats.",
+            "Keep the elbow bend the same throughout — this is not a triceps extension.",
+            "Pull back over to the chest by driving the upper arms, ribs kept down."
+          ]
         },
         {
           "id": "pull-face-pull",
           "name": "Face pulls",
           "sets": 3,
-          "targetReps": 20,
+          "targetReps": "15-20",
           "weightKg": 15,
           "unit": "pulley",
-          "increment": 2.5,
-          "notes": "Light. Elbows high, pull to the forehead."
+          "description": "Rope pull to the face on a high cable. Rear delts, rotator cuff and mid traps — the shoulder-health exercise. Trainer: 15 kg on the stack.",
+          "technique": [
+            "Rope at about forehead height, step back so the arms are extended.",
+            "Pull the rope towards the face with the elbows high and wide.",
+            "Finish with the hands beside the ears, as if showing off your biceps.",
+            "Light weight, full control — no leaning back to move the stack."
+          ]
         },
         {
           "id": "pull-incline-curl",
           "name": "Incline DB curl",
           "sets": 3,
-          "targetReps": 12,
-          "weightKg": 9,
+          "targetReps": "8-10",
+          "weightKg": 10,
           "unit": "perHand",
-          "increment": 1,
-          "notes": "Bench at 45 degrees, arms hanging back."
+          "description": "Curl performed seated on an incline bench with the arms hanging back. Puts the biceps long head under a stretch. Trainer: 10 kg per hand.",
+          "technique": [
+            "Bench at about 45°, back and head on the pad, arms hanging straight down and slightly behind you.",
+            "Curl without moving the upper arm forward — elbows stay behind the torso.",
+            "Squeeze at the top, then lower slowly to a full stretch.",
+            "Don't shrug or swing; if you have to, the weight is too heavy."
+          ]
+        },
+        {
+          "id": "pull-zottman-curl",
+          "name": "Zottman curl",
+          "sets": 2,
+          "targetReps": "10-12",
+          "weightKg": 8,
+          "unit": "perHand",
+          "description": "Curl up with the palms facing up, rotate at the top, lower with the palms facing down. Biceps on the way up, forearms and brachialis on the way down. Trainer: 8 kg per hand.",
+          "technique": [
+            "Standing, curl the dumbbells with palms up as in a normal curl.",
+            "At the top, rotate the wrists so the palms face down.",
+            "Lower slowly with the palms down — this half is the point of the exercise.",
+            "Rotate back to palms up at the bottom and repeat."
+          ]
+        },
+        {
+          "id": "core-weighted-crunch",
+          "name": "Weighted crunch on bench",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 5,
+          "unit": "plate",
+          "description": "Crunch with a plate held on the chest, feet on a bench or knees bent. Adds load to the upper abs so they can progress like any other muscle. Trainer: 5–8 kg plate.",
+          "technique": [
+            "Lie on your back, plate held against the chest, lower back pressed into the floor.",
+            "Curl the ribs towards the hips — the shoulder blades leave the floor, the lower back does not.",
+            "Exhale hard at the top and hold for a beat.",
+            "Lower slowly; don't pull on the neck or yank with the arms."
+          ]
+        },
+        {
+          "id": "core-plank",
+          "name": "Plank",
+          "sets": 3,
+          "targetReps": 45,
+          "measure": "seconds",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "Static front hold on the forearms. Trains the whole core to resist extension. Log the seconds held per set.",
+          "technique": [
+            "Elbows under the shoulders, forearms flat, feet together or hip width.",
+            "Squeeze the glutes and tuck the pelvis so the lower back does not sag.",
+            "Push the floor away so the upper back is slightly rounded, not collapsed.",
+            "Hold a straight line from head to heels; stop the set when the hips drop."
+          ]
+        }
+      ]
+    },
+    "push-b": {
+      "name": "Push B",
+      "family": "push",
+      "focus": "Shoulder focus",
+      "exercises": [
+        {
+          "id": "push-arnold-press",
+          "name": "Arnold press",
+          "sets": 4,
+          "targetReps": "8-10",
+          "weightKg": 10,
+          "unit": "perHand",
+          "description": "Seated press that starts with the palms facing you and rotates to palms forward on the way up. Hits all three heads of the delts through the rotation. Trainer: 2 kg below your overhead press weight.",
+          "technique": [
+            "Sit with back supported, dumbbells in front of the shoulders, palms facing you.",
+            "As you press, rotate the palms outward so they face forward at the top.",
+            "Keep the movement smooth — the rotation and the press happen together.",
+            "Reverse the rotation on the way down; don't let the elbows drop below the shoulders."
+          ]
+        },
+        {
+          "id": "push-db-incline-press",
+          "name": "Incline DB press",
+          "sets": 3,
+          "targetReps": "8-12",
+          "weightKg": 14,
+          "unit": "perHand",
+          "description": "Press on a bench set around 30°. Emphasises the upper chest and front delts. Trainer: 2 kg above the weight you used before.",
+          "technique": [
+            "Bench at about 30°, shoulder blades pulled back and down, feet planted.",
+            "Lower the dumbbells to the upper chest with the elbows about 45° out.",
+            "Press up and slightly together, stopping just short of lockout.",
+            "Same controlled two-second descent as the flat press."
+          ]
+        },
+        {
+          "id": "push-close-grip-db-press",
+          "name": "Close-grip DB press",
+          "sets": 3,
+          "targetReps": "10-12",
+          "weightKg": 10,
+          "unit": "perHand",
+          "description": "Flat press with the dumbbells held close together and the elbows tucked in. Shifts the work towards the triceps and inner chest. Trainer: about 70–75% of your flat bench weight.",
+          "technique": [
+            "Palms facing each other, dumbbells touching or nearly touching.",
+            "Lower with the elbows tucked close to the ribs, down to the lower chest.",
+            "Press up in a straight line, driving through the triceps.",
+            "Keep the wrists straight and the dumbbells close the whole rep."
+          ]
+        },
+        {
+          "id": "push-db-upright-row",
+          "name": "DB upright row",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 10,
+          "unit": "perHand",
+          "description": "Pull two dumbbells up the front of the body, leading with the elbows. Side delts and upper traps. Trainer: 10–12 kg per hand.",
+          "technique": [
+            "Dumbbells hanging in front of the thighs, slightly wider than the hips.",
+            "Pull up with the elbows leading, hands staying below the elbows.",
+            "Stop when the elbows reach shoulder height — going higher pinches the shoulder.",
+            "Lower slowly; don't heave with the legs or lower back."
+          ]
+        },
+        {
+          "id": "push-prone-y-raise",
+          "name": "Prone incline Y-raise",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 2,
+          "unit": "perHand",
+          "description": "Lying chest-down on an incline bench, raise light dumbbells up and out into a Y shape. Lower traps and rear delts, the small muscles that keep the shoulders healthy. Trainer: 2–3 kg per hand.",
+          "technique": [
+            "Chest on the incline bench, arms hanging straight down, thumbs up.",
+            "Raise the arms up and out at about 45° so the body forms a Y at the top.",
+            "Lead with the thumbs and squeeze the shoulder blades down and together.",
+            "Very light weight; if the traps shrug up, go lighter."
+          ]
+        },
+        {
+          "id": "push-seated-oh-extension",
+          "name": "Seated DB overhead extension",
+          "sets": 3,
+          "targetReps": "10-12",
+          "weightKg": 16,
+          "unit": "single",
+          "description": "Seated, hold one dumbbell overhead with both hands and lower it behind the head. Loads the long head of the triceps in a stretched position. Trainer: one 16–18 kg dumbbell.",
+          "technique": [
+            "Sit tall, both hands cupping the top plate of one dumbbell held overhead.",
+            "Lower it behind the head by bending only at the elbows; the upper arms stay by the ears.",
+            "Go as deep as the shoulders comfortably allow, then extend back to the top.",
+            "Keep the ribs down and don't flare the elbows out wide."
+          ]
+        },
+        {
+          "id": "core-kneeling-pulley-crunch",
+          "name": "Kneeling pulley crunch",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 15,
+          "unit": "pulley",
+          "description": "Kneeling under a high cable holding a rope at the head, crunch the ribs down towards the hips. Weighted upper-ab work with constant tension. Trainer: 15 kg on the stack.",
+          "technique": [
+            "Kneel facing the stack, rope held at the sides of the head, hips staying still.",
+            "Crunch by rounding the spine and bringing the elbows towards the knees.",
+            "The hips don't move — if they hinge, you are using the hip flexors, not the abs.",
+            "Return slowly to a tall kneel with the abs stretched."
+          ]
+        },
+        {
+          "id": "core-db-side-bend",
+          "name": "DB side bend",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 16,
+          "unit": "single",
+          "description": "Standing with one dumbbell at the side, bend sideways and return. Loads the obliques. Reps are per side. Trainer: one 16 kg dumbbell.",
+          "technique": [
+            "Stand tall, dumbbell in one hand, the other hand behind the head or on the hip.",
+            "Bend sideways towards the dumbbell, sliding it down the leg.",
+            "Return by pulling with the opposite oblique — don't lean forward or back.",
+            "Complete all reps on one side before switching."
+          ]
+        }
+      ]
+    },
+    "pull-b": {
+      "name": "Pull B",
+      "family": "pull",
+      "focus": "Upper back focus",
+      "exercises": [
+        {
+          "id": "pull-scap-pullup",
+          "name": "Scapular pull-ups",
+          "sets": 2,
+          "targetReps": 8,
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "Warm-up. Hanging from the bar with straight arms, pull the shoulder blades down and together to lift the body a few centimetres. Wakes up the lats and lower traps before the heavy pulling.",
+          "technique": [
+            "Dead hang with straight arms and a full grip.",
+            "Without bending the elbows, drive the shoulders down and away from the ears.",
+            "Hold the top for a second, then let the shoulders rise back up slowly.",
+            "Small movement — the arms never bend."
+          ]
+        },
+        {
+          "id": "pull-sa-pulldown-activation",
+          "name": "Straight-arm pulldown (warm-up)",
+          "sets": 2,
+          "targetReps": 15,
+          "weightKg": 10,
+          "unit": "pulley",
+          "description": "Light lat activation on the cable before the working sets. Not a working set — the goal is to feel the lats, not to fatigue them. Trainer: 10 kg on the stack.",
+          "technique": [
+            "Stand facing the high pulley, slight hinge at the hips, arms straight.",
+            "Sweep the bar down to the thighs in an arc, keeping the elbows nearly locked.",
+            "Squeeze the lats at the bottom, then let the bar rise slowly overhead.",
+            "Keep the load light enough to feel the lats on every rep."
+          ]
+        },
+        {
+          "id": "pull-chest-supported-row",
+          "name": "Chest-supported DB row, elbows flared",
+          "sets": 4,
+          "targetReps": "10-12",
+          "weightKg": 18,
+          "unit": "perHand",
+          "description": "Main upper-back exercise of the day. Lying chest-down on an incline bench, row with the elbows out wide. Flaring the elbows shifts the work from the lats to the rear delts, rhomboids and mid traps. Trainer: 18 kg per hand.",
+          "technique": [
+            "Chest stays glued to the bench the whole set — no lifting off to heave.",
+            "Row with the elbows out at about 60–90°, pulling towards the chest rather than the hips.",
+            "Squeeze the shoulder blades together hard at the top.",
+            "Lower all the way until the shoulder blades spread apart."
+          ]
+        },
+        {
+          "id": "pull-sa-pulldown-working",
+          "name": "Straight-arm pulldown",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 17,
+          "unit": "pulley",
+          "description": "The working version of the cable straight-arm pulldown. Isolates the lats without the biceps helping. Trainer: 17 kg on the stack.",
+          "technique": [
+            "Slight hinge at the hips, arms straight with a soft elbow, chest up.",
+            "Sweep the bar down in an arc to the thighs, driving with the lats.",
+            "Squeeze at the bottom for a beat.",
+            "Let the bar rise slowly until the arms are overhead and the lats are stretched."
+          ]
+        },
+        {
+          "id": "pull-prone-t-raise",
+          "name": "Prone incline T-raise",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 2,
+          "unit": "perHand",
+          "description": "Chest-down on an incline bench, raise light dumbbells straight out to the sides into a T. Rear delts and mid traps. Trainer: 2–3 kg per hand.",
+          "technique": [
+            "Chest on the bench, arms hanging straight down, palms facing forward or thumbs up.",
+            "Raise the arms straight out to the sides to shoulder height.",
+            "Squeeze the shoulder blades together at the top.",
+            "Lower slowly; keep the neck relaxed and the traps from shrugging."
+          ]
+        },
+        {
+          "id": "pull-db-shrug",
+          "name": "DB shrugs",
+          "sets": 3,
+          "targetReps": "12-15",
+          "weightKg": 24,
+          "unit": "perHand",
+          "description": "Standing with heavy dumbbells at the sides, shrug the shoulders straight up. Upper traps. Trainer: 24–28 kg per hand.",
+          "technique": [
+            "Stand tall, dumbbells at the sides, arms straight and relaxed.",
+            "Shrug the shoulders straight up towards the ears — not rolled forward or back.",
+            "Pause for a second at the top.",
+            "Lower slowly to a full stretch; don't bend the elbows to help."
+          ]
+        },
+        {
+          "id": "pull-hammer-curl",
+          "name": "Hammer curl",
+          "sets": 3,
+          "targetReps": "10-12",
+          "weightKg": 12,
+          "unit": "perHand",
+          "description": "Curl with the palms facing each other throughout. Hits the brachialis and forearms as well as the biceps — adds arm thickness. Trainer: 12 kg per hand.",
+          "technique": [
+            "Stand tall, dumbbells at the sides, palms facing the thighs.",
+            "Curl up keeping the thumb on top the whole way.",
+            "Elbows stay by the ribs; don't swing them forward.",
+            "Lower under control to a full extension."
+          ]
+        },
+        {
+          "id": "pull-spider-curl",
+          "name": "Spider curl",
+          "sets": 3,
+          "targetReps": "10-12",
+          "weightKg": 8,
+          "unit": "perHand",
+          "description": "Curl performed chest-down on an incline bench with the arms hanging in front. The opposite of the incline curl — the biceps work in a shortened position, giving a hard peak contraction. Trainer: 8 kg per hand.",
+          "technique": [
+            "Chest on the incline bench, arms hanging straight down in front, palms forward.",
+            "Curl up without letting the upper arms swing back.",
+            "Squeeze hard at the top — this is the whole point of the exercise.",
+            "Lower slowly to a full stretch at the bottom."
+          ]
+        },
+        {
+          "id": "core-hanging-leg-raise",
+          "name": "Hanging leg raises",
+          "sets": 3,
+          "targetReps": "8-12",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "The straight-leg version of the knee raise. Hanging from a bar, lift the legs to horizontal or higher. Harder on the lower abs and hip flexors.",
+          "technique": [
+            "Hang with a full grip, shoulders slightly pulled down.",
+            "Tuck the pelvis first, then raise the straight legs to at least parallel.",
+            "Pause at the top and lower slowly without swinging.",
+            "If the legs must bend, bend them the same amount every rep."
+          ]
+        },
+        {
+          "id": "core-side-plank",
+          "name": "Side plank",
+          "sets": 3,
+          "targetReps": 30,
+          "measure": "seconds",
+          "weightKg": null,
+          "unit": "bodyweight",
+          "description": "Static hold on one forearm with the body in a straight line. Trains the obliques and the muscles that stabilise the spine. Each set is one hold per side — log the seconds you held.",
+          "technique": [
+            "Elbow directly under the shoulder, feet stacked or staggered.",
+            "Lift the hips until shoulders, hips and ankles form a straight line.",
+            "Squeeze the glutes and keep the top hip from sinking or rotating back.",
+            "Breathe normally; stop the set when the line breaks, not when the clock says so."
+          ]
         }
       ]
     }

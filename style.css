@@ -172,11 +172,16 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .btn-danger  { background: transparent; border-color: color-mix(in srgb, var(--bad) 55%, var(--line)); color: var(--bad); }
 .btn-small   { min-height: var(--tap); font-size: 0.9rem; }
 
+.day-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 .day-btn {
   display: block;
   width: 100%;
-  min-height: 104px;
-  padding: 18px;
+  min-height: 112px;
+  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--surface-1);
@@ -184,16 +189,121 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 }
 .day-btn .day-name {
   display: block;
-  font-size: 2rem;
+  font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  line-height: 1.15;
 }
-.day-btn .day-last { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 0.9rem; }
-.day-btn[data-day="push"] .day-name { color: var(--accent); }
-.day-btn[data-day="pull"] .day-name { color: var(--reps); }
+.day-btn .day-focus { display: block; margin-top: 2px; color: var(--text-secondary); font-size: 0.85rem; }
+.day-btn .day-last { display: block; margin-top: 6px; color: var(--text-muted); font-size: 0.78rem; }
+.day-btn[data-family="push"] .day-name { color: var(--accent); }
+.day-btn[data-family="pull"] .day-name { color: var(--reps); }
+.fam-push { color: var(--accent); }
+.fam-pull { color: var(--reps); }
 
 .linkrow { display: flex; gap: 10px; }
 .linkrow .btn { flex: 1; }
+
+.link-btn {
+  display: inline-block;
+  min-height: 32px;
+  padding: 2px 10px;
+  margin-left: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* ---------- session exercise list ---------- */
+
+.ex-list { display: flex; flex-direction: column; gap: 10px; }
+.ex-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+.ex-row.is-locked { border-color: color-mix(in srgb, var(--good) 55%, var(--line)); }
+.ex-row-move { display: flex; flex-direction: column; gap: 4px; flex: none; }
+.move-btn {
+  width: 40px;
+  flex: 1;
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  line-height: 1;
+}
+.move-btn:disabled { opacity: 0.3; cursor: default; }
+.ex-row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 2px 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+}
+.ex-row-name { font-weight: 700; font-size: 1.05rem; line-height: 1.25; }
+.ex-row-name .lock { color: var(--good); margin-right: 6px; }
+.ex-row-target { color: var(--text-secondary); font-size: 0.85rem; }
+.ex-row-last { color: var(--text-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.ex-row-score { color: var(--text-primary); font-size: 0.95rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ex-row-cmp { font-size: 0.8rem; font-weight: 600; }
+.ex-row-cmp.is-better { color: var(--good); }
+.ex-row-cmp.is-same   { color: var(--text-secondary); }
+.ex-row-cmp.is-worse  { color: var(--warn); }
+.ex-row .link-btn { align-self: flex-start; margin: 4px 0 0; }
+.ex-row .target-editor { margin-top: 8px; }
+
+/* ---------- exercise info + target editor ---------- */
+
+.ex-info {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-1);
+  padding: 10px var(--pad);
+}
+.ex-info summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.ex-info .sub { margin: 10px 0 0; }
+.ex-cues { margin: 8px 0 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.9rem; }
+.ex-cues li { margin: 4px 0; }
+
+.target-editor { padding: 14px var(--pad); }
+.target-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.target-fields input { font-size: 1.05rem; padding: 10px; }
+
+.compare-hint {
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+}
+.compare-hint.is-better { color: var(--good); background: color-mix(in srgb, var(--good) 18%, var(--surface-2)); }
+.compare-hint.is-worse  { color: var(--warn); background: color-mix(in srgb, var(--warn) 18%, var(--surface-2)); }
+.compare-hint + .verdict-hint { margin-top: -6px; }
 
 /* ---------- session ---------- */
 
@@ -244,13 +354,18 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .rep-missed { color: var(--bad); }
 .rep-short  { color: var(--warn); }
 .rep-target {
+  display: inline-block;
   margin-left: 10px;
   color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
+.lasttime .reps { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+.lasttime .reps .rep { white-space: nowrap; }
+.lasttime .reps .rep .unit { font-size: 1rem; }
 
 .progress-line {
   display: flex;
@@ -303,6 +418,14 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   letter-spacing: 0.02em;
 }
 .lasttime .meta { margin-top: 6px; display: flex; gap: 10px; align-items: center; font-size: 0.85rem; color: var(--text-muted); }
+.lasttime .best {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
 .lasttime.empty { border-color: var(--line); }
 .lasttime.empty .label { color: var(--text-muted); }
 
@@ -319,19 +442,32 @@ button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .tag-short   { background: color-mix(in srgb, var(--warn) 25%, transparent); color: var(--warn); }
 .tag-fail    { background: color-mix(in srgb, var(--bad) 25%, transparent);  color: var(--bad); }
 
-.set-row {
-  display: flex;
+.set-row, .set-head {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr var(--tap);
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
-.set-row label {
-  width: 68px;
-  flex: none;
+.set-row.no-weight, .set-head.no-weight { grid-template-columns: 28px 1fr var(--tap); }
+.set-head span {
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  padding-left: 2px;
 }
+.set-row label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.set-row input { padding-left: 12px; padding-right: 12px; }
+
+/* The grey baseline: last time (or the target). What you type is white on top. */
+.set-row input::placeholder { color: var(--text-muted); opacity: 1; }
+.set-row input:not(:placeholder-shown) { color: var(--text-primary); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 
 input[type="number"], input[type="text"], input[type="password"], select {
   width: 100%;
@@ -366,17 +502,6 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 }
 .btn-success { background: var(--good); border-color: var(--good); color: #06231a; }
 .btn-fail    { background: transparent; border-color: var(--bad); color: var(--bad); }
-
-/* progression prompt — inline, never blocks the screen */
-.progress-prompt {
-  border: 1px solid var(--warn);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--warn) 14%, var(--surface-1));
-  padding: 14px;
-}
-.progress-prompt h3 { font-size: 1.05rem; color: var(--warn); }
-.progress-prompt .opts { display: flex; gap: 10px; margin-top: 12px; }
-.progress-prompt .opts .btn { flex: 1; }
 
 /* ---------- history ---------- */
 
@@ -508,7 +633,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
-.stat-num.is-hot { color: var(--warn); }
+.stat-num.is-up { color: var(--good); }
 .stat-label {
   display: block;
   margin-top: 2px;

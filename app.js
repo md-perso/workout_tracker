@@ -5,11 +5,12 @@
  */
 'use strict';
 
-var APP_VERSION = '1.0.0';
+var APP_VERSION = '2.0.0';
 
 var K = {
   SESSIONS:  'wt.sessions',
   OVERRIDES: 'wt.overrides',
+  ORDER:     'wt.order',
   CREDS:     'wt.creds',
   DRAFT:     'wt.draft',
   SKIPS:     'wt.skips',
@@ -21,14 +22,15 @@ var state = {
   screen: 'home',
   routine: null,
   sessions: [],
-  overrides: {},
+  overrides: {},   /* { exId: { sets, targetReps, weightKg } } — edited targets */
+  order: {},       /* { dayKey: [exId, ...] } — your exercise order per day */
   creds: { username: '', repo: '', branch: 'main', token: '' },
-  draft: null,
-  skips: {},        /* { 'YYYY-MM-DD': 'push' } — days deliberately not trained */
+  draft: null,     /* { id, date, day, current: exId|null, entries: [] } */
+  skips: {},        /* { 'YYYY-MM-DD': 'push-a' } — days deliberately not trained */
   dirty: false,     /* local store differs from the cloud for a non-session reason */
   sync: { busy: false, error: '' },
   history: { tab: 'sessions', expanded: null, exerciseId: '' },
-  ui: { showToken: false, dismissedProgress: {}, calOffset: 0 }
+  ui: { showToken: false, calOffset: 0, editTarget: null, routineDay: null }
 };
 
 /* ------------------------------------------------------------------ *
@@ -61,6 +63,7 @@ function writeJSON(key, value) {
 
 function saveSessions()  { return writeJSON(K.SESSIONS, state.sessions); }
 function saveOverrides() { return writeJSON(K.OVERRIDES, state.overrides); }
+function saveOrder()     { return writeJSON(K.ORDER, state.order); }
 function saveCreds()     { return writeJSON(K.CREDS, state.creds); }
 function saveSkips()     { return writeJSON(K.SKIPS, state.skips); }
 
@@ -151,15 +154,41 @@ function dayKeys() {
   return state.routine ? Object.keys(state.routine.days) : [];
 }
 
-function dayExercises(day) {
-  if (!state.routine || !state.routine.days[day]) return [];
-  return state.routine.days[day].exercises.map(effective);
+/* 'push' | 'pull' — colours and the rotation fallback key off this. Old
+   sessions logged as plain 'push' / 'pull' still resolve. */
+function dayFamily(day) {
+  var d = state.routine && state.routine.days[day];
+  if (d && d.family) return d.family;
+  return String(day).indexOf('pull') === 0 ? 'pull' : 'push';
 }
 
+/* Exercises for a day in the order you chose; anything not yet ordered keeps
+   its routine.json position at the end. */
+function dayExercises(day) {
+  if (!state.routine || !state.routine.days[day]) return [];
+  var seeds = state.routine.days[day].exercises;
+  var order = state.order[day] || [];
+  var rank = {};
+  order.forEach(function (id, i) { rank[id] = i; });
+  return seeds.map(function (ex, i) { return { ex: ex, i: i }; })
+    .sort(function (a, b) {
+      var ra = rank[a.ex.id] === undefined ? order.length + a.i : rank[a.ex.id];
+      var rb = rank[b.ex.id] === undefined ? order.length + b.i : rank[b.ex.id];
+      return ra - rb;
+    })
+    .map(function (p) { return effective(p.ex); });
+}
+
+/* Every distinct exercise; one shared across days appears once. */
 function allExercises() {
   var out = [];
+  var seen = {};
   dayKeys().forEach(function (d) {
-    state.routine.days[d].exercises.forEach(function (ex) { out.push(effective(ex)); });
+    state.routine.days[d].exercises.forEach(function (ex) {
+      if (seen[ex.id]) return;
+      seen[ex.id] = true;
+      out.push(effective(ex));
+    });
   });
   return out;
 }
@@ -172,7 +201,9 @@ function exerciseById(id) {
 
 function exerciseName(id) {
   var ex = exerciseById(id);
-  return ex ? ex.name : id;
+  if (ex) return ex.name;
+  var retired = state.routine && state.routine.retired;
+  return (retired && retired[id]) || id;
 }
 
 /* routine.json stays the untouched seed; overrides layer on top. */
@@ -180,12 +211,14 @@ function effective(ex) {
   var o = state.overrides[ex.id];
   var merged = {
     id: ex.id, name: ex.name, sets: ex.sets, targetReps: ex.targetReps,
-    weightKg: ex.weightKg, unit: ex.unit, increment: ex.increment,
-    notes: ex.notes, overridden: false
+    weightKg: ex.weightKg, unit: ex.unit, measure: ex.measure === 'seconds' ? 'seconds' : 'reps',
+    description: ex.description || '', technique: Array.isArray(ex.technique) ? ex.technique : [],
+    overridden: false
   };
   if (o) {
+    if (o.sets !== undefined && o.sets !== null)             { merged.sets       = o.sets;       merged.overridden = true; }
     if (o.targetReps !== undefined && o.targetReps !== null) { merged.targetReps = o.targetReps; merged.overridden = true; }
-    if (o.weightKg !== undefined && o.weightKg !== null)     { merged.weightKg   = o.weightKg;   merged.overridden = true; }
+    if (o.weightKg !== undefined)                            { merged.weightKg   = o.weightKg;   merged.overridden = true; }
   }
   return merged;
 }
@@ -195,8 +228,11 @@ function unitLabel(unit) {
   if (unit === 'single')     return 'single DB';
   if (unit === 'bodyweight') return 'bodyweight';
   if (unit === 'pulley')     return 'pulley';
+  if (unit === 'plate')      return 'plate';
   return unit || '';
 }
+
+function measureUnit(ex) { return ex.measure === 'seconds' ? 's' : 'reps'; }
 
 function weightText(ex) {
   if (ex.weightKg === null || ex.weightKg === undefined) {
@@ -206,12 +242,52 @@ function weightText(ex) {
 }
 
 function targetText(ex) {
-  return ex.sets + ' × ' + ex.targetReps;
+  return ex.sets + ' × ' + ex.targetReps + (ex.measure === 'seconds' ? ' s' : '');
+}
+
+/* Weight used on set i. Entries logged before per-set weights carry one
+   weightKg for every set. */
+function setWeight(entry, i) {
+  if (Array.isArray(entry.weightsKg)) return num(entry.weightsKg[i]);
+  return num(entry.weightKg);
+}
+
+function setWeights(entry) {
+  var miss = entry.missed || [];
+  return (entry.reps || []).map(function (r, i) { return miss[i] ? null : setWeight(entry, i); })
+                           .filter(function (w) { return w !== null; });
+}
+
+function maxWeight(entry) {
+  var ws = setWeights(entry);
+  return ws.length ? Math.max.apply(null, ws) : num(entry.weightKg);
+}
+
+function minWeight(entry) {
+  var ws = setWeights(entry);
+  return ws.length ? Math.min.apply(null, ws) : num(entry.weightKg);
+}
+
+function uniformWeight(entry) {
+  return maxWeight(entry) === minWeight(entry);
+}
+
+/* "8 · 8 · 7" — or "14×8 · 13×10" when the weight changed between sets. */
+function repsList(entry, ex) {
+  var miss = entry.missed || [];
+  var mixed = !uniformWeight(entry);
+  return (entry.reps || []).map(function (r, i) {
+    if (miss[i]) return '✕';
+    var rep = (r === null || r === undefined) ? '–' : String(r);
+    var w = setWeight(entry, i);
+    return (mixed && w !== null) ? w + '×' + rep : rep;
+  }).join(' · ') + (ex && ex.measure === 'seconds' ? ' s' : '');
 }
 
 /* What a logged entry's weight reads as — a blank pulley entry is not bodyweight. */
 function entryWeightText(entry) {
-  if (entry.weightKg !== null && entry.weightKg !== undefined) return entry.weightKg + ' kg';
+  var hi = maxWeight(entry), lo = minWeight(entry);
+  if (hi !== null) return (lo !== hi ? lo + '–' + hi : hi) + ' kg';
   var ex = exerciseById(entry.exerciseId);
   if (ex && ex.unit === 'bodyweight') return 'bodyweight';
   if (ex && ex.unit === 'pulley') return 'pulley';
@@ -226,13 +302,22 @@ function repsTop(t) {
   return Number(m[2] !== undefined ? m[2] : m[1]);
 }
 
-function bumpReps(t) {
-  if (typeof t === 'number') return t + 1;
-  var s = String(t).trim();
-  var range = s.match(/^(\d+)\s*-\s*(\d+)$/);
-  if (range) return range[1] + '-' + (Number(range[2]) + 1);
-  if (/^\d+$/.test(s)) return Number(s) + 1;
-  return null; /* e.g. "max" — caller derives a number from history instead */
+function repsBottom(t) {
+  if (typeof t === 'number') return t;
+  var m = String(t).match(/^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$/);
+  if (!m) return null;
+  return Number(m[1]);
+}
+
+/* Accepts "10", "8-12" or "max"; returns the normalised target or null. */
+function parseTarget(raw) {
+  var s = String(raw === null || raw === undefined ? '' : raw).trim().replace(/\s*[–—]\s*/g, '-');
+  if (!s) return null;
+  if (/^max$/i.test(s)) return 'max';
+  var m = s.match(/^(\d+)\s*-\s*(\d+)$/);
+  if (m) return Number(m[1]) <= Number(m[2]) ? m[1] + '-' + m[2] : null;
+  if (/^\d+$/.test(s)) return Number(s);
+  return null;
 }
 
 /* ------------------------------------------------------------------ *
@@ -272,20 +357,86 @@ function lastSessionForDay(day) {
   return null;
 }
 
-/* Consecutive successes since the last progression (or since the beginning). */
-function streakFor(exId) {
-  var o = state.overrides[exId];
-  var since = o && o.progressedAt ? o.progressedAt : null;
+/* The entry for exId logged most recently before `session`. */
+function entryBefore(exId, session) {
   var list = sessionsDesc();
-  var n = 0;
   for (var i = 0; i < list.length; i++) {
-    var s = list[i];
-    if (since && String(s.date) <= String(since)) break;
-    var e = (s.entries || []).filter(function (x) { return x.exerciseId === exId; })[0];
-    if (!e) continue;
-    if (e.outcome === 'success') n++; else break;
+    if (String(list[i].date) >= String(session.date)) continue;
+    var e = (list[i].entries || []).filter(function (x) { return x.exerciseId === exId; })[0];
+    if (e) return { session: list[i], entry: e };
   }
-  return n;
+  return null;
+}
+
+function totalReps(entry) {
+  var miss = entry.missed || [];
+  return (entry.reps || []).reduce(function (a, r, i) { return a + (miss[i] ? 0 : (num(r) || 0)); }, 0);
+}
+
+/* Kilograms moved: Σ weight × reps over attempted sets. */
+function tonnage(entry) {
+  var miss = entry.missed || [];
+  return (entry.reps || []).reduce(function (a, r, i) {
+    var w = setWeight(entry, i);
+    return a + (miss[i] || w === null ? 0 : w * (num(r) || 0));
+  }, 0);
+}
+
+/* How two entries differ: { kind, delta } where kind is 'top' (heaviest set
+   changed), 'tonnage' (same top weight, weights vary or differ per set),
+   or 'reps' (no weights, or the same weight every set). */
+function entryDelta(cur, prev) {
+  var wc = maxWeight(cur), wp = maxWeight(prev);
+  if (wc !== null && wp !== null) {
+    if (wc !== wp) return { kind: 'top', delta: Math.round((wc - wp) * 100) / 100 };
+    if (!uniformWeight(cur) || !uniformWeight(prev)) {
+      return { kind: 'tonnage', delta: Math.round((tonnage(cur) - tonnage(prev)) * 100) / 100 };
+    }
+  }
+  return { kind: 'reps', delta: totalReps(cur) - totalReps(prev) };
+}
+
+/* 'better' | 'same' | 'worse' — a heavier top set wins; at the same top
+   weight more kilograms moved (or more reps / seconds) wins. */
+function compareEntries(cur, prev) {
+  var d = entryDelta(cur, prev).delta;
+  return d > 0 ? 'better' : d < 0 ? 'worse' : 'same';
+}
+
+function compareText(cur, prev, ex) {
+  var d = entryDelta(cur, prev);
+  var sign = d.delta > 0 ? '+' : '';
+  if (d.kind === 'top') return (d.delta > 0 ? 'Heavier top set: ' : 'Lighter top set: ') + sign + d.delta + ' kg';
+  if (d.delta === 0) return 'Same as last time';
+  var what = d.kind === 'tonnage' ? ' kg lifted' : ' ' + measureUnit(ex);
+  return (d.delta > 0 ? 'Better than last time: ' : 'Below last time: ') + sign + d.delta + what;
+}
+
+/* "+2 reps" / "-2 kg" / "+24 kg lifted" / "same" — for tight rows. */
+function compareShort(cur, prev, ex) {
+  var d = entryDelta(cur, prev);
+  if (d.delta === 0 && d.kind !== 'top') return 'same';
+  var sign = d.delta > 0 ? '+' : '';
+  if (d.kind === 'top') return sign + d.delta + ' kg';
+  if (d.kind === 'tonnage') return sign + d.delta + ' kg lifted';
+  return sign + d.delta + ' ' + measureUnit(ex);
+}
+
+/* "12 kg · 11 · 11 · 10", "14×8 · 13×10 · 13×10" when weights vary, and no
+   weight at all for bodyweight work. */
+function entrySummary(entry, ex) {
+  if ((ex && ex.unit === 'bodyweight') || !uniformWeight(entry)) return repsList(entry, ex);
+  return entryWeightText(entry) + ' · ' + repsList(entry, ex);
+}
+
+/* Your best ever on an exercise, by the same ordering as compareEntries. */
+function bestEntryFor(exId) {
+  var best = null;
+  entriesFor(exId).forEach(function (r) {
+    if (r.entry.outcome === 'fail') return;
+    if (!best || compareEntries(r.entry, best.entry) === 'better') best = r;
+  });
+  return best;
 }
 
 function pendingCount() {
@@ -304,12 +455,17 @@ function dayDiff(fromKey, toKey) {
   return Math.round((b - a) / 86400000);
 }
 
-/* The next day in the rotation after `day`. With two days this alternates. */
+/* The next day in the rotation after `day`: push-a, pull-a, push-b, pull-b.
+   A day that is no longer in routine.json (an old plain 'push') hands over to
+   the first day of the other family, so the push/pull rhythm is kept. */
 function nextDayAfter(day) {
   var keys = dayKeys();
   if (!keys.length) return day;
   var i = keys.indexOf(day);
-  return keys[(i + 1) % keys.length];
+  if (i >= 0) return keys[(i + 1) % keys.length];
+  var fam = dayFamily(day);
+  for (var k = 0; k < keys.length; k++) if (dayFamily(keys[k]) !== fam) return keys[k];
+  return keys[0];
 }
 
 function shiftDayKey(key, n) {
@@ -445,7 +601,15 @@ function progressStats() {
   var last30 = state.sessions.filter(function (s) { return isoDay(s.date) >= cutoff; }).length;
   var skipped30 = Object.keys(state.skips).filter(function (k) { return k >= cutoff; }).length;
 
-  var ready = allExercises().filter(function (ex) { return streakFor(ex.id) >= 3; });
+  /* In the most recent session, how many exercises beat their previous entry. */
+  var latest = sessionsDesc()[0];
+  var improved = [];
+  if (latest) {
+    (latest.entries || []).forEach(function (e) {
+      var prev = entryBefore(e.exerciseId, latest);
+      if (prev && compareEntries(e, prev.entry) === 'better') improved.push(e.exerciseId);
+    });
+  }
 
   /* Rolling 7-day buckets, oldest first, ending today. */
   var weeks = [];
@@ -463,14 +627,13 @@ function progressStats() {
 
   /* Everything that has moved off its routine.json seed. */
   var moved = [];
+  var seen = {};
   dayKeys().forEach(function (day) {
     state.routine.days[day].exercises.forEach(function (seed) {
-      var now = effective(seed);
-      if (!now.overridden) return;
-      var bits = [];
-      if (now.weightKg !== seed.weightKg) bits.push(seed.weightKg + ' → ' + now.weightKg + ' kg');
-      if (String(now.targetReps) !== String(seed.targetReps)) bits.push(seed.targetReps + ' → ' + now.targetReps + ' reps');
-      if (bits.length) moved.push({ name: now.name, text: bits.join(' · ') });
+      if (seen[seed.id]) return;
+      seen[seed.id] = true;
+      var text = overrideText(seed);
+      if (text) moved.push({ name: seed.name, text: text });
     });
   });
 
@@ -478,10 +641,25 @@ function progressStats() {
     total: state.sessions.length,
     last30: last30,
     skipped30: skipped30,
-    ready: ready,
+    improved: improved,
+    latest: latest,
     weeks: weeks,
     moved: moved
   };
+}
+
+/* "14 → 16 kg · 8-10 → 8-12 reps" against the routine.json seed, or ''. */
+function overrideText(seed) {
+  var now = effective(seed);
+  if (!now.overridden) return '';
+  var bits = [];
+  var unit = measureUnit(now);
+  if (now.sets !== seed.sets) bits.push(seed.sets + ' → ' + now.sets + ' sets');
+  if (String(now.targetReps) !== String(seed.targetReps)) bits.push(seed.targetReps + ' → ' + now.targetReps + ' ' + unit);
+  if (now.weightKg !== seed.weightKg) {
+    bits.push((seed.weightKg === null ? '—' : seed.weightKg) + ' → ' + (now.weightKg === null ? '—' : now.weightKg) + ' kg');
+  }
+  return bits.join(' · ');
 }
 
 /* ------------------------------------------------------------------ *
@@ -495,6 +673,7 @@ function buildStore() {
     exportedAt: new Date().toISOString(),
     sessions: sessionsAsc(),
     overrides: state.overrides,
+    order: state.order,
     skips: state.skips
   };
 }
@@ -514,7 +693,7 @@ function buildCSV() {
         rows.push([isoDay(s.date), s.day, exerciseName(e.exerciseId), e.weightKg, '', '', '', e.outcome]);
       }
       reps.forEach(function (r, i) {
-        rows.push([isoDay(s.date), s.day, exerciseName(e.exerciseId), e.weightKg, i + 1,
+        rows.push([isoDay(s.date), s.day, exerciseName(e.exerciseId), setWeight(e, i), i + 1,
                    missed[i] ? '' : r, missed[i] ? 'missed' : 'done', e.outcome]);
       });
     });
@@ -710,9 +889,11 @@ function applyStore(store, markSynced) {
   });
   state.sessions = sessions;
   state.overrides = (store && store.overrides && typeof store.overrides === 'object') ? store.overrides : {};
+  state.order = (store && store.order && typeof store.order === 'object') ? store.order : {};
   state.skips = (store && store.skips && typeof store.skips === 'object') ? store.skips : {};
   saveSessions();
   saveOverrides();
+  saveOrder();
   saveSkips();
   if (markSynced) clearDirty(); else markDirty();
   if (!markSynced) syncNow(false);
@@ -727,17 +908,17 @@ function startSession(day) {
       !confirm('An unfinished ' + state.draft.day.toUpperCase() + ' session is still open. Discard it and start a new one?')) {
     return;
   }
-  state.draft = { id: uid(), date: new Date().toISOString(), day: day, index: 0, entries: [] };
-  state.ui.dismissedProgress = {};
+  state.draft = { id: uid(), date: new Date().toISOString(), day: day, current: null, entries: [] };
+  state.ui.editTarget = null;
   saveDraft();
   state.screen = 'session';
+  window.scrollTo(0, 0);
   render();
 }
 
 function currentExercise() {
-  if (!state.draft) return null;
-  var list = dayExercises(state.draft.day);
-  return list[state.draft.index] || null;
+  if (!state.draft || !state.draft.current) return null;
+  return dayExercises(state.draft.day).filter(function (ex) { return ex.id === state.draft.current; })[0] || null;
 }
 
 function draftEntryFor(exId) {
@@ -745,12 +926,30 @@ function draftEntryFor(exId) {
   return state.draft.entries.filter(function (e) { return e.exerciseId === exId; })[0] || null;
 }
 
-/* The reps every set must reach to count as on target. A range is only "hit"
-   at its top, which is also what a +reps progression grows — so graduating the
-   range is what unlocks the next step. "max" has no number: attempting it is
-   the target. */
+function openExercise(exId) {
+  if (!state.draft) return;
+  state.draft.current = exId;
+  state.ui.editTarget = null;
+  saveDraft();
+  window.scrollTo(0, 0);
+  render();
+}
+
+function closeExercise() {
+  if (!state.draft) return;
+  state.draft.current = null;
+  state.ui.editTarget = null;
+  saveDraft();
+  window.scrollTo(0, 0);
+  render();
+}
+
+
+/* The reps every set must reach to count as on target: the bottom of a range.
+   Whether you did better than last time is a separate line. "max" has no
+   number: attempting it is the target. */
 function targetRepsForSuccess(ex) {
-  return repsTop(ex.targetReps);
+  return repsBottom(ex.targetReps);
 }
 
 /* success = every set attempted and on target
@@ -781,35 +980,64 @@ function outcomeLabel(outcome, ex, reps, missed) {
       var r = (reps[i] === null || reps[i] === undefined) ? 0 : reps[i];
       if (target - r > worst) worst = target - r;
     }
-    return worst + ' short of target';
+    return worst + ' ' + measureUnit(ex) + ' short of target';
   }
   return 'On target';
 }
 
+/* Reps must be typed; a kg box left blank means the grey baseline it shows. */
 function readSessionInputs(ex) {
   var reps = [];
   var missed = [];
+  var weights = [];
+  var hasWeight = ex.unit !== 'bodyweight';
   for (var i = 0; i < ex.sets; i++) {
     var el = document.getElementById('set-' + i);
+    var wEl = document.getElementById('w-' + i);
     var btn = document.getElementById('miss-' + i);
     var isMissed = !!(btn && btn.getAttribute('aria-pressed') === 'true');
     missed.push(isMissed);
     reps.push(isMissed ? null : (el ? num(el.value) : null));
+    var w = null;
+    if (hasWeight && wEl) w = wEl.value.trim() === '' ? num(wEl.getAttribute('data-base')) : num(wEl.value);
+    weights.push(isMissed ? null : w);
   }
-  var wEl = document.getElementById('weight-input');
-  return { reps: reps, missed: missed, weightKg: wEl ? num(wEl.value) : null };
+  var present = weights.filter(function (w) { return w !== null; });
+  return {
+    reps: reps, missed: missed,
+    weightsKg: hasWeight ? weights : null,
+    weightKg: present.length ? Math.max.apply(null, present) : null
+  };
 }
 
-function recordEntry() {
+/* The first attempted set with no reps typed, or -1. */
+function firstBlankSet(vals) {
+  for (var i = 0; i < vals.reps.length; i++) {
+    if (!vals.missed[i] && vals.reps[i] === null) return i;
+  }
+  return -1;
+}
+
+/* Lock in: the score for this exercise is recorded in the draft and the list
+   comes back so you can pick whatever is next. */
+function lockEntry() {
   var ex = currentExercise();
   if (!ex || !state.draft) return;
   var vals = readSessionInputs(ex);
+  var blank = firstBlankSet(vals);
+  if (blank >= 0) {
+    showBanner('Set ' + (blank + 1) + ' has no ' + measureUnit(ex) + ' yet — type what you did, or tap ✕ if you could not attempt it.');
+    var el = document.getElementById('set-' + blank);
+    if (el) el.focus();
+    return;
+  }
   var entry = {
     exerciseId: ex.id,
     weightKg: vals.weightKg,
     reps: vals.reps,
     outcome: computeOutcome(ex, vals.reps, vals.missed)
   };
+  if (vals.weightsKg) entry.weightsKg = vals.weightsKg;
   /* Only carry the array when something was actually missed. */
   if (vals.missed.some(Boolean)) entry.missed = vals.missed;
 
@@ -817,20 +1045,25 @@ function recordEntry() {
   state.draft.entries.forEach(function (e, i) { if (e.exerciseId === ex.id) idx = i; });
   if (idx >= 0) state.draft.entries[idx] = entry; else state.draft.entries.push(entry);
 
-  var total = dayExercises(state.draft.day).length;
-  if (state.draft.index >= total - 1) {
-    finishSession();
-  } else {
-    state.draft.index += 1;
-    saveDraft();
-    window.scrollTo(0, 0);
-    render();
-  }
+  state.draft.current = null;
+  state.ui.editTarget = null;
+  saveDraft();
+  window.scrollTo(0, 0);
+  render();
 }
 
 function finishSession() {
   var d = state.draft;
   if (!d) return;
+  if (!d.entries.length) {
+    showBanner('Nothing is locked in yet — lock in at least one exercise, or Abandon.');
+    return;
+  }
+  var pending = dayExercises(d.day).filter(function (ex) { return !draftEntryFor(ex.id); });
+  if (pending.length && !confirm(pending.length + ' exercise' + (pending.length === 1 ? ' is' : 's are') +
+      ' not locked in and will not be logged:\n\n' +
+      pending.map(function (ex) { return '• ' + ex.name; }).join('\n') + '\n\nFinish anyway?')) return;
+
   var order = {};
   dayExercises(d.day).forEach(function (ex, i) { order[ex.id] = i; });
   var entries = d.entries.slice().sort(function (a, b) {
@@ -875,60 +1108,76 @@ function abandonSession() {
   syncNow(false);
 }
 
-function goBackExercise() {
-  if (!state.draft || state.draft.index <= 0) return;
-  state.draft.index -= 1;
-  saveDraft();
-  window.scrollTo(0, 0);
-  render();
-}
-
 /* ------------------------------------------------------------------ *
- * Progression
+ * Targets and order — yours to set, session by session
  * ------------------------------------------------------------------ */
 
-function canProgressWeight(ex) {
-  return ex.increment !== null && ex.increment !== undefined;
-}
-
-function applyProgression(exId, kind) {
+/* Reads the inline target editor for exId and stores it as an override. */
+function saveTarget(exId) {
   var ex = exerciseById(exId);
   if (!ex) return;
-  var o = state.overrides[exId] ? Object.assign({}, state.overrides[exId]) : {};
+  var setsEl = document.getElementById('tgt-sets-' + exId);
+  var repsEl = document.getElementById('tgt-reps-' + exId);
+  var wEl = document.getElementById('tgt-weight-' + exId);
 
-  if (kind === 'weight') {
-    if (!canProgressWeight(ex)) return;
-    var base = (ex.weightKg === null || ex.weightKg === undefined) ? 0 : ex.weightKg;
-    o.weightKg = Math.round((base + ex.increment) * 100) / 100;
-  } else {
-    var bumped = bumpReps(ex.targetReps);
-    if (bumped === null) {
-      /* "max" has no number to bump — turn the best set so far into a goal. */
-      var last = lastEntryFor(exId);
-      var best = 0;
-      if (last) (last.entry.reps || []).forEach(function (r) { if (num(r) !== null && r > best) best = r; });
-      bumped = best + 1;
-    }
-    o.targetReps = bumped;
+  var sets = num(setsEl && setsEl.value);
+  if (sets === null || sets < 1 || sets > 12 || sets !== Math.floor(sets)) {
+    showBanner('Sets must be a whole number from 1 to 12.'); return;
+  }
+  var target = parseTarget(repsEl && repsEl.value);
+  if (target === null) {
+    showBanner('Target must be a number (10), a range (8-12) or "max".'); return;
+  }
+  var weight = null;
+  if (wEl) {
+    weight = wEl.value.trim() === '' ? null : num(wEl.value);
+    if (wEl.value.trim() !== '' && (weight === null || weight < 0)) { showBanner('Weight must be a number of kg.'); return; }
   }
 
-  /* Reset the derived streak: only sessions after this point count again.
-     During a session, anchor just before it started so today still counts. */
-  var anchor = state.draft ? new Date(new Date(state.draft.date).getTime() - 1).toISOString()
-                           : new Date().toISOString();
-  o.progressedAt = anchor;
-
-  state.overrides[exId] = o;
+  state.overrides[exId] = { sets: sets, targetReps: target, weightKg: weight };
   saveOverrides();
   markDirty();
-  state.ui.dismissedProgress[exId] = true;
+  state.ui.editTarget = null;
   render();
+  syncNow(false);
+}
+
+function resetTarget(exId) {
+  delete state.overrides[exId];
+  saveOverrides();
+  markDirty();
+  state.ui.editTarget = null;
+  render();
+  syncNow(false);
 }
 
 function resetOverrides() {
-  if (!confirm('Drop all progression overrides and fall back to routine.json targets?')) return;
+  if (!confirm('Drop every edited target and fall back to routine.json?')) return;
   state.overrides = {};
   saveOverrides();
+  markDirty();
+  render();
+  syncNow(false);
+}
+
+/* Moves exId one step up or down within `day`; the new order sticks. */
+function moveExercise(day, exId, dir) {
+  var ids = dayExercises(day).map(function (ex) { return ex.id; });
+  var i = ids.indexOf(exId);
+  var j = i + dir;
+  if (i < 0 || j < 0 || j >= ids.length) return;
+  ids[i] = ids[j];
+  ids[j] = exId;
+  state.order[day] = ids;
+  saveOrder();
+  markDirty();
+  render();
+  syncNow(false);
+}
+
+function resetOrder(day) {
+  delete state.order[day];
+  saveOrder();
   markDirty();
   render();
   syncNow(false);
@@ -1027,12 +1276,9 @@ function barChart(values, labels) {
  * ------------------------------------------------------------------ */
 
 function renderTopbar() {
-  var titles = { home: 'Workout', session: '', history: 'History', settings: 'Settings' };
+  var titles = { home: 'Workout', session: '', history: 'History', settings: 'Settings', routine: 'Routine' };
   var title = titles[state.screen];
-  if (state.screen === 'session' && state.draft) {
-    title = (state.routine && state.routine.days[state.draft.day]
-             ? state.routine.days[state.draft.day].name : state.draft.day).toUpperCase();
-  }
+  if (state.screen === 'session' && state.draft) title = dayName(state.draft.day).toUpperCase();
   document.getElementById('topbarTitle').textContent = title || 'Workout';
 
   var back = document.getElementById('topbarBack');
@@ -1062,6 +1308,7 @@ function render() {
   else if (state.screen === 'session') html = viewSession();
   else if (state.screen === 'history') html = viewHistory();
   else if (state.screen === 'settings') html = viewSettings();
+  else if (state.screen === 'routine') html = viewRoutine();
   else                                 html = viewHome();
   app.innerHTML = html;
   afterRender();
@@ -1075,17 +1322,33 @@ function afterRender() {
   if (state.screen === 'session') updateVerdictHint();
 }
 
-/* Recomputes the verdict line from the live inputs. Touches only that one
-   element — a full re-render mid-set would steal focus from the keypad. */
+/* Recomputes the verdict and vs-last-time lines from the live inputs. Touches
+   only those elements — a full re-render mid-set would steal focus from the keypad. */
 function updateVerdictHint() {
   var el = document.getElementById('verdict-hint');
   if (!el) return;
   var ex = currentExercise();
   if (!ex) return;
   var vals = readSessionInputs(ex);
+  var cmp = document.getElementById('compare-hint');
+  var blank = firstBlankSet(vals);
+  if (blank >= 0) {
+    el.className = 'verdict-hint';
+    el.textContent = 'Fill in set ' + (blank + 1);
+    if (cmp) cmp.hidden = true;
+    return;
+  }
   var outcome = computeOutcome(ex, vals.reps, vals.missed);
   el.className = 'verdict-hint is-' + outcome;
   el.textContent = outcomeLabel(outcome, ex, vals.reps, vals.missed);
+
+  if (!cmp) return;
+  var last = lastEntryFor(ex.id);
+  if (!last) { cmp.hidden = true; return; }
+  var cur = { weightKg: vals.weightKg, weightsKg: vals.weightsKg, reps: vals.reps, missed: vals.missed };
+  cmp.hidden = false;
+  cmp.className = 'compare-hint is-' + compareEntries(cur, last.entry);
+  cmp.textContent = compareText(cur, last.entry, ex);
 }
 
 function viewLoading() {
@@ -1164,7 +1427,7 @@ function viewCalendarCard() {
   html += '<div class="cal-grid">' + m.cells.map(function (c) {
     if (!c) return '<div class="cal-cell is-blank"></div>';
 
-    var cls = 'cal-cell is-' + c.kind + (c.day ? ' d-' + c.day : '') + (c.isToday ? ' is-today' : '');
+    var cls = 'cal-cell is-' + c.kind + (c.day ? ' d-' + dayFamily(c.day) : '') + (c.isToday ? ' is-today' : '');
     var title = c.kind === 'done' ? dayName(c.day) + ' done'
               : c.kind === 'skip' ? dayName(c.day) + ' skipped'
               : c.kind === 'plan' ? dayName(c.day) + ' planned'
@@ -1205,24 +1468,27 @@ function viewProgressCard() {
   html += '<div class="stats">' +
     '<div class="stat"><span class="stat-num">' + st.total + '</span><span class="stat-label">Sessions</span></div>' +
     '<div class="stat"><span class="stat-num">' + st.last30 + '</span><span class="stat-label">Last 30 days</span></div>' +
-    '<div class="stat"><span class="stat-num' + (st.ready.length ? ' is-hot' : '') + '">' + st.ready.length +
-      '</span><span class="stat-label">Ready to progress</span></div>' +
+    '<div class="stat"><span class="stat-num' + (st.improved.length ? ' is-up' : '') + '">' + st.improved.length +
+      '</span><span class="stat-label">Beat last time</span></div>' +
     '</div>';
 
   var counts = st.weeks.map(function (w) { return w.count; });
   html += '<div class="chart-wrap"><div class="chart-title">Sessions per week</div>' +
           barChart(counts, st.weeks.map(function (w) { return w.label; })) + '</div>';
 
-  if (st.ready.length) {
-    html += '<div class="prog-block"><div class="chart-title">Due a bump</div>' +
-      st.ready.slice(0, 5).map(function (ex) {
-        return '<div class="prog-row"><span>' + esc(ex.name) + '</span>' +
-               '<span class="prog-val">' + streakFor(ex.id) + ' in a row</span></div>';
+  if (st.improved.length) {
+    html += '<div class="prog-block"><div class="chart-title">Improved in ' + esc(dayName(st.latest.day)) +
+      ' · ' + esc(prettyDate(st.latest.date)) + '</div>' +
+      st.improved.map(function (id) {
+        var e = (st.latest.entries || []).filter(function (x) { return x.exerciseId === id; })[0];
+        var prev = entryBefore(id, st.latest);
+        return '<div class="prog-row"><span>' + esc(exerciseName(id)) + '</span>' +
+               '<span class="prog-val is-up">' + esc(compareShort(e, prev.entry, exerciseById(id) || {})) + '</span></div>';
       }).join('') + '</div>';
   }
 
   if (st.moved.length) {
-    html += '<div class="prog-block"><div class="chart-title">Moved up since the start</div>' +
+    html += '<div class="prog-block"><div class="chart-title">Targets changed since the start</div>' +
       st.moved.map(function (m) {
         return '<div class="prog-row"><span>' + esc(m.name) + '</span>' +
                '<span class="prog-val is-up">' + esc(m.text) + '</span></div>';
@@ -1244,28 +1510,30 @@ function viewHome() {
   if (state.draft && state.draft.entries.length) {
     var total = dayExercises(state.draft.day).length;
     html += '<button class="btn btn-primary" data-act="resume">Resume ' +
-            esc(state.draft.day.toUpperCase()) + ' — ' +
-            (state.draft.index + 1) + ' of ' + total + '</button>';
+            esc(dayName(state.draft.day).toUpperCase()) + ' — ' +
+            state.draft.entries.length + ' of ' + total + ' locked in</button>';
   }
 
   html += viewTodayCard(plan);
 
-  html += dayKeys().map(function (day) {
+  html += '<div class="day-grid">' + dayKeys().map(function (day) {
+    var d = state.routine.days[day];
     var last = lastSessionForDay(day);
-    var sub = last ? 'Last done ' + prettyDate(last.date) + ' · ' + daysAgo(last.date)
-                   : 'Not done yet';
+    var sub = last ? 'Last ' + prettyDate(last.date) + ' · ' + daysAgo(last.date) : 'Not done yet';
     var isToday = (plan.status === 'train' && plan.day === day);
     return '<button class="day-btn' + (isToday ? ' is-today' : '') + '" data-day="' + esc(day) +
-           '" data-act="start" type="button">' +
-           '<span class="day-name">' + esc(state.routine.days[day].name.toUpperCase()) +
+           '" data-family="' + esc(dayFamily(day)) + '" data-act="start" type="button">' +
+           '<span class="day-name">' + esc(d.name.toUpperCase()) +
            (isToday ? '<span class="today-badge">Today</span>' : '') + '</span>' +
+           (d.focus ? '<span class="day-focus">' + esc(d.focus) + '</span>' : '') +
            '<span class="day-last">' + esc(sub) + '</span></button>';
-  }).join('');
+  }).join('') + '</div>';
 
   html += viewCalendarCard();
   html += viewProgressCard();
 
   html += '<div class="linkrow">' +
+          '<button class="btn" data-act="go" data-screen="routine" type="button">Routine</button>' +
           '<button class="btn" data-act="go" data-screen="history" type="button">History</button>' +
           '<button class="btn" data-act="go" data-screen="settings" type="button">Settings</button>' +
           '</div>';
@@ -1279,125 +1547,269 @@ function viewSession() {
   if (!state.draft) { state.screen = 'home'; return viewHome(); }
   var list = dayExercises(state.draft.day);
   if (!list.length) return '<div class="card">This day has no exercises in routine.json.</div>';
+  return currentExercise() ? viewSessionExercise() : viewSessionList(list);
+}
 
-  var idx = Math.min(state.draft.index, list.length - 1);
-  var ex = list[idx];
-  var last = lastEntryFor(ex.id);
-  var recorded = draftEntryFor(ex.id);
-  var isLast = idx >= list.length - 1;
-
+/* The day's exercises in your order. Open any of them; lock in a score;
+   finish when you are done. */
+function viewSessionList(list) {
+  var day = state.draft.day;
+  var done = state.draft.entries.length;
   var html = '';
 
-  /* progress */
   html += '<div>' +
-          '<div class="progress-line"><span>' + (idx + 1) + ' of ' + list.length + '</span>' +
-          '<span>' + esc(state.routine.days[state.draft.day].name) + '</span></div>' +
-          '<div class="progress-bar"><i style="width:' + (((idx + 1) / list.length) * 100).toFixed(0) + '%"></i></div>' +
+          '<div class="progress-line"><span>' + done + ' of ' + list.length + ' locked in</span>' +
+          '<span>' + esc(state.routine.days[day].focus || dayName(day)) + '</span></div>' +
+          '<div class="progress-bar"><i style="width:' + ((done / list.length) * 100).toFixed(0) + '%"></i></div>' +
           '</div>';
 
-  /* progression prompt */
-  var streak = streakFor(ex.id);
-  if (streak >= 3 && !state.ui.dismissedProgress[ex.id]) {
-    html += '<div class="progress-prompt">' +
-            '<h3>' + streak + ' in a row — time to progress</h3>' +
-            '<p class="sub">' + esc(ex.name) + ' is at ' + esc(targetText(ex)) +
-            (ex.weightKg !== null && ex.weightKg !== undefined ? ' @ ' + esc(ex.weightKg + ' kg') : '') + '.</p>' +
-            '<div class="opts">' +
-            '<button class="btn" data-act="progress" data-kind="reps" data-ex="' + esc(ex.id) + '" type="button">+ reps</button>' +
-            (canProgressWeight(ex)
-              ? '<button class="btn" data-act="progress" data-kind="weight" data-ex="' + esc(ex.id) +
-                '" type="button">+ ' + esc(ex.increment) + ' kg</button>'
-              : '') +
-            '</div>' +
-            '<button class="btn btn-ghost btn-small" style="margin-top:10px" data-act="progress-dismiss" data-ex="' +
-              esc(ex.id) + '" type="button">Not yet</button>' +
-            '</div>';
-  }
+  html += '<div class="ex-list">' + list.map(function (ex, i) {
+    var rec = draftEntryFor(ex.id);
+    var last = lastEntryFor(ex.id);
+    var status;
+    if (rec) {
+      status = '<span class="ex-row-score">' + esc(entrySummary(rec, ex)) + '</span>' +
+               (last ? '<span class="ex-row-cmp is-' + compareEntries(rec, last.entry) + '">' +
+                       esc(compareText(rec, last.entry, ex)) + '</span>' : '');
+    } else if (last) {
+      status = '<span class="ex-row-last">Last: ' + esc(entrySummary(last.entry, ex)) + '</span>';
+    } else {
+      status = '<span class="ex-row-last">First time</span>';
+    }
+    return '<div class="ex-row' + (rec ? ' is-locked' : '') + '">' +
+      '<div class="ex-row-move">' +
+      '<button class="move-btn" data-act="move-ex" data-day="' + esc(day) + '" data-ex="' + esc(ex.id) + '" data-dir="-1" type="button"' +
+        (i === 0 ? ' disabled' : '') + ' aria-label="Move up">&#9650;</button>' +
+      '<button class="move-btn" data-act="move-ex" data-day="' + esc(day) + '" data-ex="' + esc(ex.id) + '" data-dir="1" type="button"' +
+        (i === list.length - 1 ? ' disabled' : '') + ' aria-label="Move down">&#9660;</button>' +
+      '</div>' +
+      '<button class="ex-row-main" data-act="open-exercise" data-ex="' + esc(ex.id) + '" type="button">' +
+      '<span class="ex-row-name">' + (rec ? '<span class="lock">✓</span>' : '') + esc(ex.name) + '</span>' +
+      '<span class="ex-row-target">' + esc(targetText(ex)) + ' · ' + esc(weightText(ex)) + '</span>' +
+      status +
+      '</button></div>';
+  }).join('') + '</div>';
 
-  /* exercise header */
+  html += '<button class="btn btn-advance" data-act="finish" type="button">FINISH SESSION</button>';
+  html += '<p class="muted center">' + (done < list.length
+    ? 'Tap an exercise to log it. ▲▼ changes the order for every session.'
+    : 'Everything is locked in. Finish saves the session.') + '</p>';
+
+  html += '<div class="linkrow">' +
+          '<button class="btn btn-danger" data-act="abandon" type="button">Abandon</button>' +
+          '</div>';
+  return html;
+}
+
+/* Inline editor for sets, target reps (or seconds) and weight. */
+function targetEditorHtml(ex) {
+  var id = esc(ex.id);
+  var seconds = ex.measure === 'seconds';
+  var hasWeight = ex.unit !== 'bodyweight';
+  return '<div class="card target-editor">' +
+    '<div class="card-title">Edit target</div>' +
+    '<div class="target-fields">' +
+    '<div><label class="field-label" for="tgt-sets-' + id + '">Sets</label>' +
+    '<input id="tgt-sets-' + id + '" type="number" inputmode="numeric" min="1" max="12" step="1" value="' + esc(ex.sets) + '"></div>' +
+    '<div><label class="field-label" for="tgt-reps-' + id + '">' + (seconds ? 'Seconds' : 'Reps') + '</label>' +
+    '<input id="tgt-reps-' + id + '" type="text" inputmode="numeric" autocomplete="off" value="' + esc(ex.targetReps) +
+    '" placeholder="' + (seconds ? '30' : '8-12') + '"></div>' +
+    (hasWeight
+      ? '<div><label class="field-label" for="tgt-weight-' + id + '">Kg ' + esc(unitLabel(ex.unit)) + '</label>' +
+        '<input id="tgt-weight-' + id + '" type="number" inputmode="decimal" min="0" step="0.5" value="' +
+        esc(ex.weightKg === null || ex.weightKg === undefined ? '' : ex.weightKg) + '"></div>'
+      : '') +
+    '</div>' +
+    '<div class="hint">' + (seconds ? 'A number of seconds per set.' : 'A number (10), a range (8-12) or max.') + '</div>' +
+    '<div class="row" style="margin-top:12px">' +
+    '<button class="btn btn-primary btn-small" data-act="save-target" data-ex="' + id + '" type="button">Save</button>' +
+    '<button class="btn btn-ghost btn-small" data-act="cancel-target" type="button">Cancel</button>' +
+    '</div>' +
+    (ex.overridden
+      ? '<button class="btn btn-ghost btn-small" style="margin-top:8px" data-act="reset-target" data-ex="' + id +
+        '" type="button">Back to routine.json target</button>'
+      : '') +
+    '</div>';
+}
+
+function exerciseHeaderHtml(ex, showEdit) {
+  return '<div>' +
+    '<div class="ex-name">' + esc(ex.name) + '</div>' +
+    '<div class="ex-target">' + esc(targetText(ex)) + ' · ' + esc(weightText(ex)) +
+    (ex.overridden ? ' <span class="tag tag-success">edited</span>' : '') +
+    (showEdit && state.ui.editTarget !== ex.id
+      ? ' <button class="link-btn" data-act="edit-target" data-ex="' + esc(ex.id) + '" type="button">Edit target</button>'
+      : '') +
+    '</div></div>' +
+    (state.ui.editTarget === ex.id ? targetEditorHtml(ex) : '');
+}
+
+function exerciseInfoHtml(ex) {
+  if (!ex.description && !ex.technique.length) return '';
+  return '<details class="ex-info" open>' +
+    '<summary>How to do it</summary>' +
+    (ex.description ? '<p class="sub">' + esc(ex.description) + '</p>' : '') +
+    (ex.technique.length
+      ? '<ul class="ex-cues">' + ex.technique.map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul>'
+      : '') +
+    '</details>';
+}
+
+function lastTimeHtml(ex) {
+  var last = lastEntryFor(ex.id);
+  if (!last) {
+    return '<div class="lasttime empty"><div class="label">Last time</div>' +
+           '<div class="sub" style="margin-top:6px">First time logging this one — set the bar.</div></div>';
+  }
+  var hi = maxWeight(last.entry);
+  var mixed = !uniformWeight(last.entry);
+  var lw = hi === null
+    ? esc(entryWeightText(last.entry))
+    : esc(mixed ? minWeight(last.entry) + '–' + hi : hi) + '<span class="unit"> kg ' + esc(unitLabel(ex.unit)) + '</span>';
+  var lmiss = last.entry.missed || [];
+  var ltarget = targetRepsForSuccess(ex);
+  var html = '<div class="lasttime">' +
+    '<div class="label">Last time · ' + esc(prettyDate(last.session.date)) + ' · ' + esc(daysAgo(last.session.date)) + '</div>' +
+    '<div class="weight">' + lw + '</div>' +
+    '<div class="reps">' + (last.entry.reps || []).map(function (r, i) {
+      if (lmiss[i]) return '<span class="rep rep-missed">✕</span>';
+      if (r === null || r === undefined) return '<span class="rep">–</span>';
+      var short = ltarget !== null && r < ltarget;
+      var w = setWeight(last.entry, i);
+      return '<span class="rep' + (short ? ' rep-short' : '') + '">' +
+             (mixed && w !== null ? '<span class="unit">' + esc(w) + '×</span>' : '') + esc(r) + '</span>';
+    }).join('<span class="unit">·</span>') + (ex.measure === 'seconds' ? '<span class="unit">s</span>' : '') +
+    (ltarget !== null ? '<span class="rep-target">target ' + esc(ex.targetReps) + '</span>' : '') +
+    '</div>' +
+    '<div class="meta">' + outcomeTag(last.entry.outcome) + '<span>Beat it or match it.</span></div>';
+
+  var best = bestEntryFor(ex.id);
+  if (best && best.session.id !== last.session.id) {
+    html += '<div class="best">Best · ' + esc(prettyDate(best.session.date)) + ' · ' + esc(entrySummary(best.entry, ex)) + '</div>';
+  }
+  return html + '</div>';
+}
+
+function viewSessionExercise() {
+  var ex = currentExercise();
+  var list = dayExercises(state.draft.day);
+  var pos = list.map(function (x) { return x.id; }).indexOf(ex.id);
+  var last = lastEntryFor(ex.id);
+  var recorded = draftEntryFor(ex.id);
+  var html = '';
+
   html += '<div>' +
-          '<div class="ex-name">' + esc(ex.name) + '</div>' +
-          '<div class="ex-target">' + esc(targetText(ex)) + ' · ' + esc(weightText(ex)) +
-          (ex.overridden ? ' <span class="tag tag-success">progressed</span>' : '') + '</div>' +
-          (ex.notes ? '<div class="ex-notes">' + esc(ex.notes) + '</div>' : '') +
+          '<div class="progress-line"><span>' + (pos + 1) + ' of ' + list.length + '</span>' +
+          '<span>' + state.draft.entries.length + ' locked in</span></div>' +
+          '<div class="progress-bar"><i style="width:' + ((state.draft.entries.length / list.length) * 100).toFixed(0) + '%"></i></div>' +
           '</div>';
 
-  /* LAST TIME — the headline of this screen */
-  if (last) {
-    var lw = (last.entry.weightKg === null || last.entry.weightKg === undefined)
-      ? esc(entryWeightText(last.entry))
-      : last.entry.weightKg + '<span class="unit"> kg ' + esc(unitLabel(ex.unit)) + '</span>';
-    var lmiss = last.entry.missed || [];
-    var ltarget = targetRepsForSuccess(ex);
-    html += '<div class="lasttime">' +
-            '<div class="label">Last time</div>' +
-            '<div class="weight">' + lw + '</div>' +
-            '<div class="reps">' + (last.entry.reps || []).map(function (r, i) {
-              if (lmiss[i]) return '<span class="rep-missed">✕</span>';
-              if (r === null || r === undefined) return '–';
-              var short = ltarget !== null && r < ltarget;
-              return '<span class="' + (short ? 'rep-short' : '') + '">' + esc(r) + '</span>';
-            }).join(' · ') +
-            (ltarget !== null ? '<span class="rep-target">target ' + esc(ltarget) + '</span>' : '') +
-            '</div>' +
-            '<div class="meta">' + outcomeTag(last.entry.outcome) +
-            '<span>' + esc(prettyDate(last.session.date)) + ' · ' + esc(daysAgo(last.session.date)) + '</span>' +
-            (streak > 0 ? '<span>streak ' + streak + '</span>' : '') +
-            '</div></div>';
-  } else {
-    html += '<div class="lasttime empty"><div class="label">Last time</div>' +
-            '<div class="sub" style="margin-top:6px">First time logging this one.</div></div>';
-  }
+  html += exerciseHeaderHtml(ex, true);
+  html += lastTimeHtml(ex);
+  html += exerciseInfoHtml(ex);
 
-  /* inputs */
-  var prefill = [];
-  for (var i = 0; i < ex.sets; i++) {
-    var v = '';
-    if (recorded && recorded.reps && recorded.reps[i] !== null && recorded.reps[i] !== undefined) v = recorded.reps[i];
-    else if (last && last.entry.reps && last.entry.reps[i] !== null && last.entry.reps[i] !== undefined) v = last.entry.reps[i];
-    else { var t = repsTop(ex.targetReps); v = (t === null ? '' : t); }
-    prefill.push(v);
-  }
-
-  var weightVal = '';
-  if (recorded && recorded.weightKg !== null && recorded.weightKg !== undefined) weightVal = recorded.weightKg;
-  else if (ex.weightKg !== null && ex.weightKg !== undefined) weightVal = ex.weightKg;
-  else if (last && last.entry.weightKg !== null && last.entry.weightKg !== undefined) weightVal = last.entry.weightKg;
-
+  /* Inputs. The grey baseline in each box is last time (or the target); what
+     you type sits on top in white. Something already locked in shows in white. */
+  var hasWeight = ex.unit !== 'bodyweight';
   var recMissed = (recorded && recorded.missed) || [];
+  var unit = measureUnit(ex);
+  var topTarget = repsTop(ex.targetReps);
 
-  html += '<div class="card stack">';
+  var rowCls = hasWeight ? '' : ' no-weight';
+  html += '<div class="card stack">' +
+    '<div class="set-head' + rowCls + '"><span>Set</span><span>' + esc(unit) + '</span>' +
+    (hasWeight ? '<span>kg ' + esc(unitLabel(ex.unit)) + '</span>' : '') + '<span></span></div>';
+
   for (var j = 0; j < ex.sets; j++) {
     var miss = !!recMissed[j];
-    html += '<div class="set-row' + (miss ? ' is-missed' : '') + '" id="row-' + j + '">' +
-            '<label for="set-' + j + '">Set ' + (j + 1) + '</label>' +
+    var lastReps = last && last.entry.reps ? num(last.entry.reps[j]) : null;
+    var baseReps = lastReps !== null ? lastReps : (topTarget === null ? '' : topTarget);
+    var recReps = recorded && !miss ? num(recorded.reps[j]) : null;
+
+    var lastW = last ? setWeight(last.entry, j) : null;
+    var baseW = lastW !== null ? lastW : (ex.weightKg === null || ex.weightKg === undefined ? '' : ex.weightKg);
+    var recW = recorded && !miss ? setWeight(recorded, j) : null;
+
+    html += '<div class="set-row' + rowCls + (miss ? ' is-missed' : '') + '" id="row-' + j + '">' +
+            '<label for="set-' + j + '">' + (j + 1) + '</label>' +
             '<input id="set-' + j + '" type="number" inputmode="numeric" pattern="[0-9]*" step="1" min="0" ' +
-            'enterkeyhint="next" autocomplete="off" value="' + esc(miss ? '' : prefill[j]) + '"' +
-            (miss ? ' disabled' : '') + '>' +
+            'enterkeyhint="next" autocomplete="off" placeholder="' + esc(baseReps) + '" value="' +
+            esc(recReps === null ? '' : recReps) + '"' + (miss ? ' disabled' : '') + '>' +
+            (hasWeight
+              ? '<input id="w-' + j + '" type="number" inputmode="decimal" step="0.5" min="0" ' +
+                'enterkeyhint="next" autocomplete="off" placeholder="' + esc(baseW) + '" data-base="' + esc(baseW) +
+                '" value="' + esc(recW === null ? '' : recW) + '"' + (miss ? ' disabled' : '') + '>'
+              : '') +
             '<button class="miss-btn" id="miss-' + j + '" data-act="toggle-miss" data-set="' + j +
             '" type="button" aria-pressed="' + (miss ? 'true' : 'false') +
             '" title="Could not attempt this set" aria-label="Set ' + (j + 1) +
             ': could not attempt">✕</button>' +
             '</div>';
   }
-  html += '<div class="set-row"><label for="weight-input">Kg</label>' +
-          '<input id="weight-input" type="number" inputmode="decimal" step="0.5" min="0" ' +
-          'enterkeyhint="done" autocomplete="off" value="' + esc(weightVal) + '"></div>';
+  html += '<p class="hint" style="margin:0">Grey is ' + (last ? 'last time' : 'the target') +
+          '. Type your ' + esc(unit) + ' over it' + (hasWeight ? '; leave a kg box blank to keep the grey value' : '') + '.</p>';
   html += '</div>';
 
+  html += '<div id="compare-hint" class="compare-hint" hidden></div>';
   html += '<div id="verdict-hint" class="verdict-hint"></div>';
 
-  html += '<button class="btn btn-advance" data-act="advance" type="button">' +
-          (isLast ? 'FINISH SESSION' : 'NEXT') + '</button>';
-
-  if (isLast) html += '<p class="muted center">Saves the session and takes you home.</p>';
-  else if (recorded) html += '<p class="muted center">Already logged as ' + esc(recorded.outcome) + ' — advancing overwrites it.</p>';
-  else html += '<p class="muted center">Tap ✕ on any set you could not attempt.</p>';
+  html += '<button class="btn btn-advance" data-act="lock" type="button">' + (recorded ? 'LOCK IN AGAIN' : 'LOCK IN') + '</button>';
+  html += '<p class="muted center">' + (recorded
+    ? 'Already locked in as ' + esc(outcomeWord(recorded.outcome)) + ' — locking in again overwrites it.'
+    : 'Locks the score and returns to the list. Tap ✕ on any set you could not attempt.') + '</p>';
 
   html += '<div class="linkrow">' +
-          (idx > 0 ? '<button class="btn btn-ghost" data-act="prev-exercise" type="button">← Previous</button>' : '') +
-          '<button class="btn btn-danger" data-act="abandon" type="button">Abandon</button>' +
+          '<button class="btn btn-ghost" data-act="close-exercise" type="button">← Back to list</button>' +
           '</div>';
+  return html;
+}
+
+function outcomeWord(outcome) {
+  return outcome === 'success' ? 'on target' : outcome === 'short' ? 'short' : 'missed sets';
+}
+
+/* ---------------- Routine ---------------- */
+
+function viewRoutine() {
+  var html = '<p class="sub">Tap a day to see its exercises. ▲▼ sets the order you do them in; ' +
+             'Edit target sets the sets, reps or seconds, and weight. Everything here also shows up in a session.</p>';
+
+  html += dayKeys().map(function (day) {
+    var d = state.routine.days[day];
+    var open = state.ui.routineDay === day;
+    var list = dayExercises(day);
+    var out = '<div class="card">' +
+      '<button class="session-item" data-act="routine-day" data-day="' + esc(day) + '" type="button" ' +
+      'style="background:none;border:0;padding:0;color:inherit">' +
+      '<span class="top"><span class="date fam-' + esc(dayFamily(day)) + '">' + esc(d.name) + '</span>' +
+      '<span class="day">' + esc(d.focus || '') + '</span></span>' +
+      '<div class="muted">' + list.length + ' exercises · ' + (open ? 'tap to close' : 'tap to open') + '</div>' +
+      '</button>';
+
+    if (open) {
+      out += '<div class="entry-list">' + list.map(function (ex, i) {
+        var editing = state.ui.editTarget === ex.id;
+        return '<div class="ex-row">' +
+          '<div class="ex-row-move">' +
+          '<button class="move-btn" data-act="move-ex" data-day="' + esc(day) + '" data-ex="' + esc(ex.id) + '" data-dir="-1" type="button"' +
+            (i === 0 ? ' disabled' : '') + ' aria-label="Move up">&#9650;</button>' +
+          '<button class="move-btn" data-act="move-ex" data-day="' + esc(day) + '" data-ex="' + esc(ex.id) + '" data-dir="1" type="button"' +
+            (i === list.length - 1 ? ' disabled' : '') + ' aria-label="Move down">&#9660;</button>' +
+          '</div>' +
+          '<div class="ex-row-main">' +
+          '<span class="ex-row-name">' + esc(ex.name) + (ex.overridden ? ' <span class="tag tag-success">edited</span>' : '') + '</span>' +
+          '<span class="ex-row-target">' + esc(targetText(ex)) + ' · ' + esc(weightText(ex)) + '</span>' +
+          (editing ? '' : '<button class="link-btn" data-act="edit-target" data-ex="' + esc(ex.id) + '" type="button">Edit target</button>') +
+          (editing ? targetEditorHtml(ex) : '') +
+          '</div></div>';
+      }).join('') + '</div>';
+      if (state.order[day]) {
+        out += '<button class="btn btn-ghost btn-small" style="margin-top:12px" data-act="reset-order" data-day="' + esc(day) +
+               '" type="button">Back to routine.json order</button>';
+      }
+    }
+    return out + '</div>';
+  }).join('');
 
   return html;
 }
@@ -1410,22 +1822,20 @@ function sessionCardHtml(s) {
   var out = '<div class="card"><button class="session-item" data-act="expand" data-id="' + esc(s.id) +
     '" type="button" style="background:none;border:0;padding:0;color:inherit">' +
     '<span class="top"><span class="date">' + esc(prettyDate(s.date)) + '</span>' +
-    '<span class="day">' + esc(s.day) + '</span></span>' +
+    '<span class="day fam-' + esc(dayFamily(s.day)) + '">' + esc(dayName(s.day)) + '</span></span>' +
     '<div class="muted">' + (s.entries || []).length + ' exercises · ' + wins + ' success' +
     (s.synced ? '' : ' · pending sync') + ' · ' + (open ? 'tap to close' : 'tap to open') + '</div>' +
     '</button>';
 
   if (open) {
     out += '<div class="entry-list">' + (s.entries || []).map(function (e) {
-      var miss = e.missed || [];
+      var prev = entryBefore(e.exerciseId, s);
+      var ex = exerciseById(e.exerciseId) || {};
       return '<div class="entry">' +
         '<span class="ename">' + esc(exerciseName(e.exerciseId)) + '</span>' +
         outcomeTag(e.outcome) +
-        '<span class="edetail">' + esc(entryWeightText(e)) + ' · ' +
-          (e.reps || []).map(function (r, i) {
-            if (miss[i]) return '✕';
-            return (r === null || r === undefined) ? '–' : esc(r);
-          }).join(' · ') +
+        '<span class="edetail">' + esc(entrySummary(e, ex)) +
+        (prev ? ' <span class="ex-row-cmp is-' + compareEntries(e, prev.entry) + '">' + esc(compareText(e, prev.entry, ex)) + '</span>' : '') +
         '</span></div>';
     }).join('') + '</div>' +
     '<button class="btn btn-danger btn-small" style="margin-top:12px" data-act="delete-session" data-id="' +
@@ -1474,7 +1884,7 @@ function viewHistoryExercise() {
   /* include anything in history that is no longer in routine.json */
   state.sessions.forEach(function (s) {
     (s.entries || []).forEach(function (e) {
-      if (!seen[e.exerciseId]) { seen[e.exerciseId] = true; options.push({ id: e.exerciseId, name: e.exerciseId }); }
+      if (!seen[e.exerciseId]) { seen[e.exerciseId] = true; options.push({ id: e.exerciseId, name: exerciseName(e.exerciseId) }); }
     });
   });
 
@@ -1492,10 +1902,7 @@ function viewHistoryExercise() {
   if (!rows.length) return html + '<p class="empty-note">No sessions with this exercise yet.</p>';
 
   var labels = rows.map(function (r) { return isoDay(r.session.date).slice(5); });
-  var weights = rows.map(function (r) {
-    var w = r.entry.weightKg;
-    return (w === null || w === undefined) ? null : Number(w);
-  });
+  var weights = rows.map(function (r) { return maxWeight(r.entry); });
   var totals = rows.map(function (r) {
     return (r.entry.reps || []).reduce(function (a, b) { return a + (num(b) || 0); }, 0);
   });
@@ -1510,11 +1917,8 @@ function viewHistoryExercise() {
     rows.slice().reverse().map(function (r, i) {
       var idx = rows.length - 1 - i;
       return '<tr><td>' + esc(isoDay(r.session.date)) + '</td>' +
-        '<td>' + (weights[idx] === null ? '–' : esc(weights[idx])) + '</td>' +
-        '<td>' + (r.entry.reps || []).map(function (x, xi) {
-            if ((r.entry.missed || [])[xi]) return '✕';
-            return (x === null || x === undefined) ? '–' : esc(x);
-          }).join('·') + '</td>' +
+        '<td>' + (weights[idx] === null ? '–' : esc(entryWeightText(r.entry).replace(' kg', ''))) + '</td>' +
+        '<td>' + esc(repsList(r.entry, null).split(' · ').join('·')) + '</td>' +
         '<td>' + esc(totals[idx]) + '</td>' +
         '<td>' + outcomeTag(r.entry.outcome) + '</td></tr>';
     }).join('') + '</tbody></table></div>';
@@ -1576,18 +1980,18 @@ function viewSettings() {
     '<input id="import-file" class="hidden-file" type="file" accept="application/json,.json">' +
     '</div></div>';
 
-  html += '<div class="card settings-group"><h2>Progression overrides</h2>';
+  html += '<div class="card settings-group"><h2>Edited targets</h2>';
   if (!ovrIds.length) {
     html += '<p class="sub">None — every target comes straight from routine.json.</p>';
   } else {
     html += ovrIds.map(function (id) {
+      var ex = exerciseById(id);
       var o = state.overrides[id];
-      var bits = [];
-      if (o.targetReps !== undefined && o.targetReps !== null) bits.push('reps → ' + o.targetReps);
-      if (o.weightKg !== undefined && o.weightKg !== null) bits.push(o.weightKg + ' kg');
-      return '<div class="ovr-item"><span>' + esc(exerciseName(id)) + '</span><span>' + esc(bits.join(' · ')) + '</span></div>';
+      var text = ex ? targetText(ex) + ' · ' + weightText(ex)
+                    : (o.sets + ' × ' + o.targetReps + (o.weightKg === null ? '' : ' · ' + o.weightKg + ' kg'));
+      return '<div class="ovr-item"><span>' + esc(exerciseName(id)) + '</span><span>' + esc(text) + '</span></div>';
     }).join('');
-    html += '<button class="btn btn-danger" style="margin-top:12px" data-act="reset-overrides" type="button">Reset overrides</button>';
+    html += '<button class="btn btn-danger" style="margin-top:12px" data-act="reset-overrides" type="button">Reset all targets</button>';
   }
   html += '</div>';
 
@@ -1665,22 +2069,38 @@ var actions = {
   'dismiss-banner': function () { hideBanner(); },
   'go': function (el) { state.screen = el.getAttribute('data-screen'); window.scrollTo(0, 0); render(); },
   'start': function (el) { startSession(el.getAttribute('data-day')); },
-  'resume': function () { state.screen = 'session'; render(); },
-  'advance': function () { recordEntry(); },
+  'resume': function () { state.screen = 'session'; window.scrollTo(0, 0); render(); },
+  'open-exercise': function (el) { openExercise(el.getAttribute('data-ex')); },
+  'close-exercise': function () { closeExercise(); },
+  'lock': function () { lockEntry(); },
+  'finish': function () { finishSession(); },
+  'edit-target': function (el) { state.ui.editTarget = el.getAttribute('data-ex'); render(); },
+  'cancel-target': function () { state.ui.editTarget = null; render(); },
+  'save-target': function (el) { saveTarget(el.getAttribute('data-ex')); },
+  'reset-target': function (el) { resetTarget(el.getAttribute('data-ex')); },
+  'move-ex': function (el) {
+    moveExercise(el.getAttribute('data-day'), el.getAttribute('data-ex'), Number(el.getAttribute('data-dir')));
+  },
+  'reset-order': function (el) { resetOrder(el.getAttribute('data-day')); },
+  'routine-day': function (el) {
+    var day = el.getAttribute('data-day');
+    state.ui.routineDay = state.ui.routineDay === day ? null : day;
+    state.ui.editTarget = null;
+    render();
+  },
   'toggle-miss': function (el) {
     var i = el.getAttribute('data-set');
     var pressed = el.getAttribute('aria-pressed') === 'true';
     el.setAttribute('aria-pressed', pressed ? 'false' : 'true');
     var input = document.getElementById('set-' + i);
+    var wInput = document.getElementById('w-' + i);
     var row = document.getElementById('row-' + i);
     if (input) { input.disabled = !pressed; if (!pressed) input.value = ''; }
-    if (row) row.className = 'set-row' + (!pressed ? ' is-missed' : '');
+    if (wInput) { wInput.disabled = !pressed; if (!pressed) wInput.value = ''; }
+    if (row) row.className = 'set-row' + (wInput ? '' : ' no-weight') + (!pressed ? ' is-missed' : '');
     updateVerdictHint();
   },
-  'prev-exercise': function () { goBackExercise(); },
   'abandon': function () { abandonSession(); },
-  'progress': function (el) { applyProgression(el.getAttribute('data-ex'), el.getAttribute('data-kind')); },
-  'progress-dismiss': function (el) { state.ui.dismissedProgress[el.getAttribute('data-ex')] = true; render(); },
   'hist-tab': function (el) { state.history.tab = el.getAttribute('data-tab'); render(); },
   'expand': function (el) {
     var id = el.getAttribute('data-id');
@@ -1734,7 +2154,15 @@ document.addEventListener('click', function (ev) {
 });
 
 document.addEventListener('input', function (ev) {
-  if (state.screen === 'session' && /^set-\d+$/.test(ev.target.id || '')) updateVerdictHint();
+  var id = ev.target.id || '';
+  if (state.screen === 'session' && /^(set|w)-\d+$/.test(id)) updateVerdictHint();
+});
+
+/* Enter in a target editor saves it. */
+document.addEventListener('keydown', function (ev) {
+  if (ev.key !== 'Enter') return;
+  var m = /^tgt-(?:sets|reps|weight)-(.+)$/.exec(ev.target.id || '');
+  if (m) { ev.preventDefault(); saveTarget(m[1]); }
 });
 
 document.addEventListener('change', function (ev) {
@@ -1811,6 +2239,7 @@ function loadRoutine() {
 function boot() {
   state.sessions  = readJSON(K.SESSIONS, []);
   state.overrides = readJSON(K.OVERRIDES, {});
+  state.order     = readJSON(K.ORDER, {});
   state.creds     = Object.assign({ username: '', repo: '', branch: 'main', token: '' }, readJSON(K.CREDS, {}));
   state.draft     = readJSON(K.DRAFT, null);
   state.skips     = readJSON(K.SKIPS, {});
@@ -1818,12 +2247,22 @@ function boot() {
 
   if (!Array.isArray(state.sessions)) state.sessions = [];
   if (!state.overrides || typeof state.overrides !== 'object') state.overrides = {};
+  if (!state.order || typeof state.order !== 'object') state.order = {};
   if (!state.skips || typeof state.skips !== 'object') state.skips = {};
+
+  /* Overrides written by the old streak progression carried no sets. */
+  Object.keys(state.overrides).forEach(function (id) {
+    var o = state.overrides[id];
+    if (!o || typeof o !== 'object') { delete state.overrides[id]; return; }
+    delete o.progressedAt;
+  });
 
   render();
   loadRoutine().then(function (routine) {
     state.routine = routine;
     if (state.draft && (!routine || !routine.days[state.draft.day])) state.draft = null;
+    if (state.draft && state.draft.current === undefined) { state.draft.current = null; delete state.draft.index; }
+    if (state.draft && !Array.isArray(state.draft.entries)) state.draft.entries = [];
     render();
     syncNow(false);
   });
