@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-07T20:49:10.826Z",
+  "exportedAt": "2026-09-07T20:49:41.492Z",
   "sessions": [
     {
       "id": "mtkefh0g-uie8ns",
@@ -245,6 +245,6 @@
     "2026-08-30": "push",
     "2026-08-31": "push",
     "2026-09-01": "push",
-    "2026-09-07": "push-b"
+    "2026-09-07": "pull-a"
   }
 }
