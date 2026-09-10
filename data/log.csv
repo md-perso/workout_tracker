@@ -1,63 +1,26 @@
 date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
-2026-09-02,push,Seated DB overhead press,12,1,11,done,short
-2026-09-02,push,Seated DB overhead press,12,2,12,done,short
-2026-09-02,push,Seated DB overhead press,12,3,8,done,short
-2026-09-02,push,Seated DB overhead press,12,4,10,done,short
-2026-09-02,push,Incline DB press,12,1,9,done,short
-2026-09-02,push,Incline DB press,12,2,9,done,short
-2026-09-02,push,Incline DB press,12,3,8,done,short
-2026-09-02,push,Incline DB press,12,4,5,done,short
-2026-09-02,push,push-leaning-lateral,6,1,10,done,short
-2026-09-02,push,push-leaning-lateral,6,2,10,done,short
-2026-09-02,push,push-leaning-lateral,6,3,10,done,short
-2026-09-02,push,DB lateral raise,6,1,20,done,success
-2026-09-02,push,DB lateral raise,6,2,20,done,success
-2026-09-02,push,DB lateral raise,6,3,20,done,success
-2026-09-02,push,push-feet-elevated-pushup,,1,,missed,fail
-2026-09-02,push,push-feet-elevated-pushup,,2,,missed,fail
-2026-09-02,push,push-feet-elevated-pushup,,3,,missed,fail
-2026-09-02,push,Pulley pushdown,15,1,15,done,success
-2026-09-02,push,Pulley pushdown,15,2,15,done,success
-2026-09-02,push,Pulley pushdown,15,3,15,done,success
-2026-09-04,pull,Scapular pull-ups,,1,8,done,success
-2026-09-04,pull,Scapular pull-ups,,2,8,done,success
-2026-09-04,pull,Straight-arm pulldown (warm-up),10,1,15,done,success
-2026-09-04,pull,Straight-arm pulldown (warm-up),10,2,15,done,success
-2026-09-04,pull,pull-pullup,75,1,7,done,success
-2026-09-04,pull,pull-pullup,75,2,5,done,success
-2026-09-04,pull,pull-pullup,75,3,5,done,success
-2026-09-04,pull,Single-arm DB row,22,1,10,done,success
-2026-09-04,pull,Single-arm DB row,22,2,10,done,success
-2026-09-04,pull,Single-arm DB row,22,3,10,done,success
-2026-09-04,pull,"Chest-supported DB row, elbows flared",16,1,15,done,success
-2026-09-04,pull,"Chest-supported DB row, elbows flared",16,2,15,done,success
-2026-09-04,pull,"Chest-supported DB row, elbows flared",16,3,15,done,success
-2026-09-04,pull,Straight-arm pulldown,15,1,15,done,success
-2026-09-04,pull,Straight-arm pulldown,15,2,15,done,success
-2026-09-04,pull,Straight-arm pulldown,15,3,15,done,success
-2026-09-04,pull,Face pulls,15,1,20,done,success
-2026-09-04,pull,Face pulls,15,2,20,done,success
-2026-09-04,pull,Face pulls,15,3,20,done,success
-2026-09-04,pull,Incline DB curl,12,1,10,done,short
-2026-09-04,pull,Incline DB curl,12,2,8,done,short
-2026-09-04,pull,Incline DB curl,12,3,8,done,short
-2026-09-06,push,Seated DB overhead press,12,1,11,done,short
-2026-09-06,push,Seated DB overhead press,12,2,11,done,short
-2026-09-06,push,Seated DB overhead press,12,3,11,done,short
-2026-09-06,push,Seated DB overhead press,12,4,10,done,short
-2026-09-06,push,Incline DB press,12,1,15,done,success
-2026-09-06,push,Incline DB press,12,2,15,done,success
-2026-09-06,push,Incline DB press,12,3,15,done,success
-2026-09-06,push,Incline DB press,12,4,15,done,success
-2026-09-06,push,push-leaning-lateral,6,1,15,done,success
-2026-09-06,push,push-leaning-lateral,6,2,15,done,success
-2026-09-06,push,push-leaning-lateral,6,3,15,done,success
-2026-09-06,push,DB lateral raise,6,1,20,done,success
-2026-09-06,push,DB lateral raise,6,2,20,done,success
-2026-09-06,push,DB lateral raise,6,3,20,done,success
-2026-09-06,push,push-feet-elevated-pushup,,1,,missed,fail
-2026-09-06,push,push-feet-elevated-pushup,,2,,missed,fail
-2026-09-06,push,push-feet-elevated-pushup,,3,,missed,fail
-2026-09-06,push,Pulley pushdown,17,1,15,done,success
-2026-09-06,push,Pulley pushdown,17,2,15,done,success
-2026-09-06,push,Pulley pushdown,17,3,15,done,success
+2026-09-08,push-a,Flat DB bench press,16,1,10,done,success
+2026-09-08,push-a,Flat DB bench press,16,2,10,done,success
+2026-09-08,push-a,Flat DB bench press,16,3,10,done,success
+2026-09-08,push-a,Flat DB bench press,16,4,10,done,success
+2026-09-08,push-a,Seated DB overhead press,12,1,10,done,success
+2026-09-08,push-a,Seated DB overhead press,12,2,10,done,success
+2026-09-08,push-a,Seated DB overhead press,12,3,10,done,success
+2026-09-08,push-a,Squeeze press,8,1,12,done,success
+2026-09-08,push-a,Squeeze press,8,2,12,done,success
+2026-09-08,push-a,Squeeze press,8,3,12,done,success
+2026-09-08,push-a,DB lateral raise,8,1,15,done,success
+2026-09-08,push-a,DB lateral raise,8,2,15,done,success
+2026-09-08,push-a,DB lateral raise,8,3,15,done,success
+2026-09-08,push-a,Lying DB skullcrusher,8,1,12,done,success
+2026-09-08,push-a,Lying DB skullcrusher,8,2,12,done,success
+2026-09-08,push-a,Lying DB skullcrusher,8,3,12,done,success
+2026-09-08,push-a,Pulley pushdown,18,1,15,done,success
+2026-09-08,push-a,Pulley pushdown,18,2,15,done,success
+2026-09-08,push-a,Pulley pushdown,18,3,15,done,success
+2026-09-08,push-a,Hanging knee raises,,1,15,done,success
+2026-09-08,push-a,Hanging knee raises,,2,15,done,success
+2026-09-08,push-a,Hanging knee raises,,3,15,done,success
+2026-09-08,push-a,Side plank,,1,30,done,success
+2026-09-08,push-a,Side plank,,2,30,done,success
+2026-09-08,push-a,Side plank,,3,30,done,success
