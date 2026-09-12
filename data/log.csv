@@ -24,3 +24,25 @@ date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
 2026-09-08,push-a,Side plank,,1,30,done,success
 2026-09-08,push-a,Side plank,,2,30,done,success
 2026-09-08,push-a,Side plank,,3,30,done,success
+2026-09-12,pull-a,Scapular pull-ups,,1,8,done,success
+2026-09-12,pull-a,Scapular pull-ups,,2,8,done,success
+2026-09-12,pull-a,Straight-arm pulldown (warm-up),10,1,15,done,success
+2026-09-12,pull-a,Straight-arm pulldown (warm-up),10,2,15,done,success
+2026-09-12,pull-a,Kneeling single-arm pulley pulldown,15,1,15,done,success
+2026-09-12,pull-a,Kneeling single-arm pulley pulldown,15,2,15,done,success
+2026-09-12,pull-a,Kneeling single-arm pulley pulldown,15,3,15,done,success
+2026-09-12,pull-a,Kneeling single-arm pulley pulldown,15,4,15,done,success
+2026-09-12,pull-a,Single-arm DB row,22,1,12,done,success
+2026-09-12,pull-a,Single-arm DB row,22,2,12,done,success
+2026-09-12,pull-a,Single-arm DB row,22,3,12,done,success
+2026-09-12,pull-a,DB pullover,,1,,missed,fail
+2026-09-12,pull-a,DB pullover,,2,,missed,fail
+2026-09-12,pull-a,DB pullover,,3,,missed,fail
+2026-09-12,pull-a,Face pulls,15,1,20,done,success
+2026-09-12,pull-a,Face pulls,15,2,20,done,success
+2026-09-12,pull-a,Face pulls,15,3,20,done,success
+2026-09-12,pull-a,Incline DB curl,10,1,12,done,success
+2026-09-12,pull-a,Incline DB curl,10,2,10,done,success
+2026-09-12,pull-a,Incline DB curl,10,3,8,done,success
+2026-09-12,pull-a,Zottman curl,6,1,15,done,success
+2026-09-12,pull-a,Zottman curl,6,2,15,done,success
