@@ -1,13 +1,13 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-10T13:20:19.044Z",
+  "exportedAt": "2026-09-12T11:01:57.029Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
       "date": "2026-09-08T18:24:40.449Z",
       "day": "push-a",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "push-flat-db-bench",
@@ -120,6 +120,131 @@
             30
           ],
           "outcome": "success"
+        }
+      ]
+    },
+    {
+      "id": "mty5sg9e-41qw7u",
+      "date": "2026-09-12T09:04:33.362Z",
+      "day": "pull-a",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "pull-scap-pullup",
+          "weightKg": null,
+          "reps": [
+            8,
+            8
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-activation",
+          "weightKg": 10,
+          "reps": [
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "pull-kneeling-sa-pulldown",
+          "weightKg": 15,
+          "reps": [
+            15,
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            15,
+            15,
+            15,
+            15
+          ]
+        },
+        {
+          "exerciseId": "pull-sa-db-row",
+          "weightKg": 22,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            22,
+            22,
+            22
+          ]
+        },
+        {
+          "exerciseId": "pull-db-pullover",
+          "weightKg": null,
+          "reps": [
+            null,
+            null,
+            null
+          ],
+          "outcome": "fail",
+          "weightsKg": [
+            null,
+            null,
+            null
+          ],
+          "missed": [
+            true,
+            true,
+            true
+          ]
+        },
+        {
+          "exerciseId": "pull-face-pull",
+          "weightKg": 15,
+          "reps": [
+            20,
+            20,
+            20
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            15,
+            15,
+            15
+          ]
+        },
+        {
+          "exerciseId": "pull-incline-curl",
+          "weightKg": 10,
+          "reps": [
+            12,
+            10,
+            8
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "pull-zottman-curl",
+          "weightKg": 6,
+          "reps": [
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            6,
+            6
+          ]
         }
       ]
     }
