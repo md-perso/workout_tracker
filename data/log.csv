@@ -46,3 +46,25 @@ date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
 2026-09-12,pull-a,Incline DB curl,10,3,8,done,success
 2026-09-12,pull-a,Zottman curl,6,1,15,done,success
 2026-09-12,pull-a,Zottman curl,6,2,15,done,success
+2026-09-14,push-b,Arnold press,10,1,10,done,success
+2026-09-14,push-b,Arnold press,10,2,10,done,success
+2026-09-14,push-b,Arnold press,10,3,10,done,success
+2026-09-14,push-b,Arnold press,10,4,10,done,success
+2026-09-14,push-b,Incline DB press,14,1,12,done,success
+2026-09-14,push-b,Incline DB press,14,2,12,done,success
+2026-09-14,push-b,Incline DB press,14,3,12,done,success
+2026-09-14,push-b,Close-grip DB press,10,1,12,done,success
+2026-09-14,push-b,Close-grip DB press,10,2,12,done,success
+2026-09-14,push-b,Close-grip DB press,10,3,12,done,success
+2026-09-14,push-b,DB upright row,10,1,15,done,success
+2026-09-14,push-b,DB upright row,10,2,15,done,success
+2026-09-14,push-b,DB upright row,10,3,15,done,success
+2026-09-14,push-b,Prone incline Y-raise,2,1,15,done,success
+2026-09-14,push-b,Prone incline Y-raise,2,2,15,done,success
+2026-09-14,push-b,Prone incline Y-raise,2,3,15,done,success
+2026-09-14,push-b,Seated DB overhead extension,16,1,12,done,success
+2026-09-14,push-b,Seated DB overhead extension,16,2,12,done,success
+2026-09-14,push-b,Seated DB overhead extension,16,3,12,done,success
+2026-09-14,push-b,DB side bend,16,1,15,done,success
+2026-09-14,push-b,DB side bend,16,2,15,done,success
+2026-09-14,push-b,DB side bend,16,3,15,done,success
