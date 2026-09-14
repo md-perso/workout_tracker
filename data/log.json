@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-12T11:01:57.029Z",
+  "exportedAt": "2026-09-14T20:24:55.129Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
@@ -127,7 +127,7 @@
       "id": "mty5sg9e-41qw7u",
       "date": "2026-09-12T09:04:33.362Z",
       "day": "pull-a",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "pull-scap-pullup",
@@ -244,6 +244,121 @@
           "weightsKg": [
             6,
             6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mu1ktp9v-g7lgfp",
+      "date": "2026-09-14T18:28:44.467Z",
+      "day": "push-b",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "push-arnold-press",
+          "weightKg": 10,
+          "reps": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10,
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "push-db-incline-press",
+          "weightKg": 14,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            14,
+            14,
+            14
+          ]
+        },
+        {
+          "exerciseId": "push-close-grip-db-press",
+          "weightKg": 10,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "push-db-upright-row",
+          "weightKg": 10,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "push-prone-y-raise",
+          "weightKg": 2,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "exerciseId": "push-seated-oh-extension",
+          "weightKg": 16,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "exerciseId": "core-db-side-bend",
+          "weightKg": 16,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            16,
+            16,
+            16
           ]
         }
       ]
