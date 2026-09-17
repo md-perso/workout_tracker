@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-14T20:24:55.129Z",
+  "exportedAt": "2026-09-17T20:35:24.617Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
@@ -252,7 +252,7 @@
       "id": "mu1ktp9v-g7lgfp",
       "date": "2026-09-14T18:28:44.467Z",
       "day": "push-b",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "push-arnold-press",
@@ -367,6 +367,7 @@
   "overrides": {},
   "order": {},
   "skips": {
-    "2026-09-07": "push-a"
+    "2026-09-07": "push-a",
+    "2026-09-17": "pull-b"
   }
 }
