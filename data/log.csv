@@ -68,3 +68,26 @@ date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
 2026-09-14,push-b,DB side bend,16,1,15,done,success
 2026-09-14,push-b,DB side bend,16,2,15,done,success
 2026-09-14,push-b,DB side bend,16,3,15,done,success
+2026-09-20,pull-b,Scapular pull-ups,,1,8,done,success
+2026-09-20,pull-b,Scapular pull-ups,,2,8,done,success
+2026-09-20,pull-b,Straight-arm pulldown (warm-up),10,1,15,done,success
+2026-09-20,pull-b,Straight-arm pulldown (warm-up),10,2,15,done,success
+2026-09-20,pull-b,"Chest-supported DB row, elbows flared",18,1,12,done,success
+2026-09-20,pull-b,"Chest-supported DB row, elbows flared",18,2,12,done,success
+2026-09-20,pull-b,"Chest-supported DB row, elbows flared",18,3,12,done,success
+2026-09-20,pull-b,"Chest-supported DB row, elbows flared",18,4,12,done,success
+2026-09-20,pull-b,Straight-arm pulldown,18,1,15,done,success
+2026-09-20,pull-b,Straight-arm pulldown,18,2,15,done,success
+2026-09-20,pull-b,Straight-arm pulldown,18,3,15,done,success
+2026-09-20,pull-b,Prone incline T-raise,2,1,15,done,success
+2026-09-20,pull-b,Prone incline T-raise,2,2,15,done,success
+2026-09-20,pull-b,Prone incline T-raise,2,3,15,done,success
+2026-09-20,pull-b,Hammer curl,12,1,12,done,success
+2026-09-20,pull-b,Hammer curl,12,2,12,done,success
+2026-09-20,pull-b,Hammer curl,12,3,12,done,success
+2026-09-20,pull-b,Spider curl,10,1,12,done,success
+2026-09-20,pull-b,Spider curl,10,2,12,done,success
+2026-09-20,pull-b,Spider curl,10,3,12,done,success
+2026-09-20,pull-b,Side plank,,1,60,done,fail
+2026-09-20,pull-b,Side plank,,2,60,done,fail
+2026-09-20,pull-b,Side plank,,3,,missed,fail
