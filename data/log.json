@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-20T12:22:08.703Z",
+  "exportedAt": "2026-09-20T14:16:26.820Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
@@ -359,6 +359,128 @@
             16,
             16,
             16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mu9s8gnb-jh27gt",
+      "date": "2026-09-20T12:18:19.847Z",
+      "day": "pull-b",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "pull-scap-pullup",
+          "weightKg": null,
+          "reps": [
+            8,
+            8
+          ],
+          "outcome": "success"
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-activation",
+          "weightKg": 10,
+          "reps": [
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "pull-chest-supported-row",
+          "weightKg": 18,
+          "reps": [
+            12,
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            18,
+            18,
+            18,
+            18
+          ]
+        },
+        {
+          "exerciseId": "pull-sa-pulldown-working",
+          "weightKg": 18,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            18,
+            18,
+            18
+          ]
+        },
+        {
+          "exerciseId": "pull-prone-t-raise",
+          "weightKg": 2,
+          "reps": [
+            15,
+            15,
+            15
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "exerciseId": "pull-hammer-curl",
+          "weightKg": 12,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            12,
+            12,
+            12
+          ]
+        },
+        {
+          "exerciseId": "pull-spider-curl",
+          "weightKg": 10,
+          "reps": [
+            12,
+            12,
+            12
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            10,
+            10,
+            10
+          ]
+        },
+        {
+          "exerciseId": "core-side-plank",
+          "weightKg": null,
+          "reps": [
+            60,
+            60,
+            null
+          ],
+          "outcome": "fail",
+          "missed": [
+            false,
+            false,
+            true
           ]
         }
       ]
