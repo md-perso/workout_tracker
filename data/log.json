@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-20T14:16:26.820Z",
+  "exportedAt": "2026-09-24T18:53:31.753Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
@@ -367,7 +367,7 @@
       "id": "mu9s8gnb-jh27gt",
       "date": "2026-09-20T12:18:19.847Z",
       "day": "pull-b",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "pull-scap-pullup",
@@ -481,6 +481,31 @@
             false,
             false,
             true
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mufujlrc-uhb5wx",
+      "date": "2026-09-24T18:09:35.976Z",
+      "day": "push-a",
+      "synced": false,
+      "entries": [
+        {
+          "exerciseId": "push-flat-db-bench",
+          "weightKg": 16,
+          "reps": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "outcome": "success",
+          "weightsKg": [
+            16,
+            16,
+            16,
+            16
           ]
         }
       ]
