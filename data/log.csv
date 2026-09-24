@@ -91,3 +91,7 @@ date,day,exercise,weightKg,setNumber,reps,setStatus,outcome
 2026-09-20,pull-b,Side plank,,1,60,done,fail
 2026-09-20,pull-b,Side plank,,2,60,done,fail
 2026-09-20,pull-b,Side plank,,3,,missed,fail
+2026-09-24,push-a,Flat DB bench press,16,1,10,done,success
+2026-09-24,push-a,Flat DB bench press,16,2,10,done,success
+2026-09-24,push-a,Flat DB bench press,16,3,10,done,success
+2026-09-24,push-a,Flat DB bench press,16,4,10,done,success
