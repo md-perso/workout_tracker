@@ -1,7 +1,7 @@
 {
   "app": "workout-tracker",
   "version": 1,
-  "exportedAt": "2026-09-24T18:53:31.753Z",
+  "exportedAt": "2026-10-29T17:24:10.541Z",
   "sessions": [
     {
       "id": "mtt01czl-22jlfm",
@@ -489,7 +489,7 @@
       "id": "mufujlrc-uhb5wx",
       "date": "2026-09-24T18:09:35.976Z",
       "day": "push-a",
-      "synced": false,
+      "synced": true,
       "entries": [
         {
           "exerciseId": "push-flat-db-bench",
